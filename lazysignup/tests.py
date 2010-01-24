@@ -1,12 +1,17 @@
+import datetime
+
 from django.http import HttpRequest
 from django.contrib.auth import SESSION_KEY
+from django.contrib.auth.models import User
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.contrib.sessions.models import Session
 from django.test import TestCase
 
 import mock
 
 from lazysignup.decorators import allow_lazy
 from lazysignup.middleware import LazySignupMiddleware
+from lazysignup.management.commands import remove_expired_users
 
 def view(request):
     from django.http import HttpResponse
@@ -63,3 +68,22 @@ class LazyTestCase(TestCase):
         # view will set the status code to 500.
         response = self.client.get('/lazy/')
         self.assertEqual(200, response.status_code)
+        
+    def testRemoteExpiredUsers(self):
+        # Users wihout usable passwords who don't have a current session record should be removed.
+        u1 = User.objects.create_user('dummy', '')
+        u2 = User.objects.create_user('dummy2', '')
+        s = Session(
+            session_key='dummy',
+            session_data='',
+            expire_date=datetime.datetime.now() + datetime.timedelta(1)
+        )
+        s.save()
+        
+        c = remove_expired_users.Command()
+        c.handle()
+        
+        users = User.objects.all()
+        self.assertEqual(1, len(users))
+        self.assertEqual(u1, users[0])
+        
