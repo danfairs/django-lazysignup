@@ -3,7 +3,7 @@ import os
 
 version = '0.1'
 
-setup(name='lazysignup',
+setup(name='django-lazysignup',
       version=version,
       description="Lazy signup for Django",
       long_description=open("README.txt").read() + "\n" +
