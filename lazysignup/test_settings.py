@@ -22,6 +22,14 @@ AUTHENTICATION_BACKENDS = (
     "lazysignup.backends.LazySignupBackend",
 )
 
+MIDDLEWARE_CLASSES = [
+    "django.middleware.common.CommonMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "lazysignup.middleware.LazySignupMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+]
+
+
 # This merely needs to be present - as long as your test case specifies a
 # urls attribute, it does not need to be populated.
 ROOT_URLCONF = ''
