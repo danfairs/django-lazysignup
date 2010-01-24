@@ -8,3 +8,7 @@ urlpatterns = patterns('lazysignup.tests',
     url(r'^nolazy/$', 'view', name='test_view'),
     url(r'^lazy/$', 'lazy_view', name='test_lazy_view'),
 )
+
+urlpatterns += patterns('lazysignup.views',
+    url(r'^convert/$', 'convert', name='lazysignup_convert'),    
+)

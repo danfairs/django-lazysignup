@@ -87,3 +87,50 @@ class LazyTestCase(TestCase):
         self.assertEqual(1, len(users))
         self.assertEqual(u1, users[0])
         
+    def testConvert(self):
+        self.client.get('/lazy/')
+        response = self.client.post('/convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'password',
+        })
+        self.assertEqual(200, response.status_code)
+        
+        users = User.objects.all()
+        self.assertEqual(1, len(users))
+        self.assertEqual('demo', users[0].username)
+        
+    def testConvertMismatchedPasswords(self):
+        self.client.get('/lazy/')
+        response = self.client.post('/convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'passwordx',
+        })
+        self.assertEqual(400, response.status_code)
+        self.failIf(response.content.find('password') == -1)
+        users = User.objects.all()
+        self.assertEqual(1, len(users))
+        self.assertNotEqual('demo', users[0].username)
+
+    def testUserExists(self):
+        User.objects.create_user('demo', '', 'foo')
+        self.client.get('/lazy/')
+        response = self.client.post('/convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'password',
+        })
+        self.assertEqual(400, response.status_code)
+        self.failIf(response.content.find('username') == -1)
+        
+    def testConvertExistingUser(self):
+        user = User.objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
+        self.client.login(username='dummy', password='dummy')
+        response = self.client.post('/convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'password',
+        })
+        self.assertEqual(400, response.status_code)
+
