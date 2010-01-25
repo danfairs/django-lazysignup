@@ -100,6 +100,11 @@ class LazyTestCase(TestCase):
         users = User.objects.all()
         self.assertEqual(1, len(users))
         self.assertEqual('demo', users[0].username)
+
+        # We should find that the auth backend used is no longer the 
+        # Lazy backend, as the conversion should have logged the new 
+        # user in.
+        self.assertNotEqual('lazysignup.backends.LazySignupBackend', self.client.session['_auth_user_backend'])
         
     def testConvertNonAjax(self):
         # If it's a regular web browser, we should get a 301.
