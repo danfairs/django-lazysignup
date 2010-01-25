@@ -14,11 +14,11 @@ from django.contrib.auth.models import User
 
 @require_POST
 @login_required
-def convert(request, form_class=UserCreationForm, redirect_field_name='redirect_to'):
+def convert(request, form_class=UserCreationForm):
     """ Convert a temporary user to a real one. Reject users who don't
     appear to be temporary users (ie. they have a usable password)
     """
-    redirect_to = request.POST.get(redirect_field_name)
+    redirect_to = request.POST.get('redirect_to')
     if not redirect_to:
         redirect_to = 'lazysignup_convert_done'
 
