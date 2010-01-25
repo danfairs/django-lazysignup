@@ -1,21 +1,36 @@
 from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_POST
+from django.views.generic.simple import direct_to_template
 
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 @require_POST
 @login_required
-def convert(request, form_class=UserCreationForm, redirect_to=None):
+def convert(request, form_class=UserCreationForm):
     """ Convert a temporary user to a real one. Reject users who don't
     appear to be temporary users (ie. they have a usable password)
     """
+    redirect_to = request.POST.get('redirect_to')
+    if not redirect_to:
+        redirect_to = 'lazysignup_convert_done'
+
+    # If the user already has a usable password, return a Bad Request to
+    # an Ajax client, or just redirect back for a regular client.
     if request.user.has_usable_password():
-        return HttpResponseBadRequest(content=_(u"Already converted."))
+        if request.is_ajax():
+            return HttpResponseBadRequest(content=_(u"Already converted."))
+        else:
+            return redirect(redirect_to)
+            
+    # Looks OK - proceed with validation.
     form = form_class(request.POST, instance=request.user)
     if form.is_valid():
         user = form.save()
@@ -33,10 +48,17 @@ def convert(request, form_class=UserCreationForm, redirect_to=None):
         if request.is_ajax():
             return HttpResponse()
         else:
-            if not redirect_to:
-                redirect_to = 'lazysignup_convert_done'
             return redirect(redirect_to)
-            
-    return HttpResponseBadRequest(content=str(form.errors))
+
+    if request.is_ajax():
+        return HttpResponseBadRequest(content=str(form.errors))
+    else:
+        return direct_to_template(
+            request,
+            'lazysignup/convert.html',
+            { 'form': form,
+              'redirect_to': redirect_to
+            },
+            )
 
         

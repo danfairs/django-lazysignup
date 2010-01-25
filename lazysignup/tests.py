@@ -120,20 +120,44 @@ class LazyTestCase(TestCase):
         self.assertEqual(1, len(users))
         self.assertEqual('demo', users[0].username)
 
-    def testConvertMismatchedPasswords(self):
+    def testConvertMismatchedPasswordsAjax(self):
         self.client.get('/lazy/')
         response = self.client.post('/convert/', {
             'username': 'demo',
             'password1': 'password',
             'password2': 'passwordx',
-        })
+        }, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(400, response.status_code)
         self.failIf(response.content.find('password') == -1)
         users = User.objects.all()
         self.assertEqual(1, len(users))
         self.assertNotEqual('demo', users[0].username)
 
-    def testUserExists(self):
+    def testUserExistsAjax(self):
+        User.objects.create_user('demo', '', 'foo')
+        self.client.get('/lazy/')
+        response = self.client.post('/convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'password',
+        }, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(400, response.status_code)
+        self.failIf(response.content.find('username') == -1)
+        
+    def testConvertMismatchedNoAjax(self):
+        self.client.get('/lazy/')
+        response = self.client.post('/convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'passwordx',
+        })
+        self.assertEqual(200, response.status_code)
+        self.failIf(response.content.find('password') == -1)
+        users = User.objects.all()
+        self.assertEqual(1, len(users))
+        self.assertNotEqual('demo', users[0].username)
+
+    def testUserExistsNoAjax(self):
         User.objects.create_user('demo', '', 'foo')
         self.client.get('/lazy/')
         response = self.client.post('/convert/', {
@@ -141,10 +165,20 @@ class LazyTestCase(TestCase):
             'password1': 'password',
             'password2': 'password',
         })
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(200, response.status_code)
         self.failIf(response.content.find('username') == -1)
-        
-    def testConvertExistingUser(self):
+
+    def testConvertExistingUserAjax(self):
+        user = User.objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
+        self.client.login(username='dummy', password='dummy')
+        response = self.client.post('/convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'password',
+        }, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(400, response.status_code)
+
+    def testConvertExistingUserNoAjax(self):
         user = User.objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
         self.client.login(username='dummy', password='dummy')
         response = self.client.post('/convert/', {
@@ -152,5 +186,5 @@ class LazyTestCase(TestCase):
             'password1': 'password',
             'password2': 'password',
         })
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(302, response.status_code)
 
