@@ -7,4 +7,5 @@ from lazysignup.urls import urlpatterns
 urlpatterns += patterns('lazysignup.tests',
     url(r'^nolazy/$', 'view', name='test_view'),
     url(r'^lazy/$', 'lazy_view', name='test_lazy_view'),
+    url(r'^lazy_args/$', 'lazy_args', name='test_lazy_args')
 )
