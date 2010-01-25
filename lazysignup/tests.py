@@ -87,19 +87,34 @@ class LazyTestCase(TestCase):
         self.assertEqual(1, len(users))
         self.assertEqual(u1, users[0])
         
-    def testConvert(self):
+    def testConvertAjax(self):
+        # Calling convert with an AJAX request should result in a 200
         self.client.get('/lazy/')
         response = self.client.post('/convert/', {
             'username': 'demo',
             'password1': 'password',
             'password2': 'password',
-        })
+        }, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(200, response.status_code)
         
         users = User.objects.all()
         self.assertEqual(1, len(users))
         self.assertEqual('demo', users[0].username)
         
+    def testConvertNonAjax(self):
+        # If it's a regular web browser, we should get a 301.
+        self.client.get('/lazy/')
+        response = self.client.post('/convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'password',
+        })
+        self.assertEqual(302, response.status_code)
+        
+        users = User.objects.all()
+        self.assertEqual(1, len(users))
+        self.assertEqual('demo', users[0].username)
+
     def testConvertMismatchedPasswords(self):
         self.client.get('/lazy/')
         response = self.client.post('/convert/', {
