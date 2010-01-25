@@ -1,7 +1,6 @@
 import datetime
 
 from django.http import HttpRequest
-from django.http import HttpResponse
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import User
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -15,23 +14,19 @@ from lazysignup.middleware import LazySignupMiddleware
 from lazysignup.management.commands import remove_expired_users
 
 def view(request):
+    from django.http import HttpResponse
     r = HttpResponse()
     if request.user.is_authenticated():
         r.status_code = 500
     return r
     
-@allow_lazy()
 def lazy_view(request):
+    from django.http import HttpResponse
     r = HttpResponse()
     if request.user.has_usable_password() or request.user.is_anonymous():
         r.status_code = 500
     return r
-
-@allow_lazy(6, foo=5)
-def lazy_args(request, number, foo=None):
-    assert 6 == number
-    assert 5 == foo
-    return HttpResponse()
+lazy_view = allow_lazy(lazy_view)
 
 class LazyTestCase(TestCase):
 
@@ -45,11 +40,7 @@ class LazyTestCase(TestCase):
     @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
     def testSessionAlreadyExists(self, mock_resolve):
         # If the user id is already in the session, this middleware should do nothing.
-        
-        @allow_lazy()
-        def f():
-            return 1
-
+        f = allow_lazy(lambda: 1)
         self.request.session[SESSION_KEY] = 1
         mock_resolve.return_value = (f, None, None)
         
@@ -60,10 +51,7 @@ class LazyTestCase(TestCase):
     def testCreateLazyUser(self, mock_resolve):
         # If there isn't a setup session, then this middleware should create a user
         # with the same name as the session key, and an unusable password.
-        @allow_lazy()
-        def f():
-            return 1
-
+        f = allow_lazy(lambda: 1)
         mock_resolve.return_value = (f, None, None)
         self.m.process_request(self.request)
         self.assertEqual(self.request.session.session_key[:30], self.request.user.username)
@@ -199,7 +187,4 @@ class LazyTestCase(TestCase):
             'password2': 'password',
         })
         self.assertEqual(302, response.status_code)
-        
-    def testExtraArgs(self):
-        response = self.client.get('/lazy_args/')
-        self.assertEqual(200, response.status_code)
+
