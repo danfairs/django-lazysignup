@@ -188,3 +188,7 @@ class LazyTestCase(TestCase):
         })
         self.assertEqual(302, response.status_code)
 
+    def testGetConvert(self):
+        self.client.get('/lazy/')
+        response = self.client.get('/convert/')
+        self.assertEqual(200, response.status_code)
