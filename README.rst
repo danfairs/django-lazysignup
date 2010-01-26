@@ -23,7 +23,7 @@ a source control system. For example, with pip::
 
   pip install -e git://github.com/danfairs/django-lazysignup.git#egg=django-lazysignup
   
-Once that's done, you need to add ``lazysignup`` to your ``INSTALLED APPS``. 
+Once that's done, you need to add ``lazysignup`` to your ``INSTALLED_APPS``. 
 You will also need to add ``lazysignup``'s authentication backend to your 
 site's ``AUTHENTICATION_BACKENDS`` setting::
 
