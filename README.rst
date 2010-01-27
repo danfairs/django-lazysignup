@@ -136,3 +136,5 @@ do::
 
   python manage.py test --settings=lazysignup.test_settings lazysignup
   
+
+Note that the tests require the ``mock`` package.
