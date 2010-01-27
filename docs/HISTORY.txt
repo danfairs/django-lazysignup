@@ -1,5 +1,11 @@
+
 Changelog
 =========
+
+0.1.1
+-----
+
+* Fix some packaging errors
 
 0.1
 ---
