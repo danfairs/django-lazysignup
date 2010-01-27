@@ -2,7 +2,7 @@ Introduction
 ============
 
 ``django-lazysignup`` is a package designed to allow users to interact with a 
-site as if they were authenticated users, but without signup up. At any time, 
+site as if they were authenticated users, but without signing up. At any time, 
 they can convert their temporary user account to a real user account.
 
 ``django-lazysignup`` is alpha software. Bug reports, patches and extensions
