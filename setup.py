@@ -12,11 +12,14 @@ setup(name='django-lazysignup',
       classifiers=[
         "Programming Language :: Python",
         "Topic :: Software Development :: Libraries :: Python Modules",
+        "Framework :: Django",
+        "Development Status :: 3 - Alpha",
+        "License :: OSI Approved :: BSD License"
         ],
-      keywords='',
+      keywords='django lazy signup app user',
       author='Dan Fairs',
       author_email='dan@fezconsulting.com',
-      url='',
+      url='http://github.com/danfairs/django-lazysignup',
       license='BSD',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=[],
@@ -24,6 +27,7 @@ setup(name='django-lazysignup',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'Django',
           # -*- Extra requirements: -*-
       ],
       entry_points="""
