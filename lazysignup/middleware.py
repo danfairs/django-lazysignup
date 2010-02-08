@@ -32,8 +32,10 @@ class LazySignupMiddleware(object):
                 return
         finally:
             # Reset URLconf for this thread on the way out for complete
-            # isolation of request.urlconf
-            urlresolvers.set_urlconf(None)
+            # isolation of request.urlconf. Only try this if the method
+            # exists (which is the case for Django > 1.2)
+            if hasattr(urlresolvers, 'set_urlconf'):
+                urlresolvers.set_urlconf(None)
             
         # See if this view has been registered as one to skip user creation
         if not ALLOW_LAZY_REGISTRY.has_key(callback):
