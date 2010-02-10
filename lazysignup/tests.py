@@ -192,3 +192,13 @@ class LazyTestCase(TestCase):
         self.client.get('/lazy/')
         response = self.client.get('/convert/')
         self.assertEqual(200, response.status_code)
+        
+    def testConversionKeepsSameUser(self):
+        self.client.get('/lazy/')
+        response = self.client.post('/convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'password',
+        })
+        self.assertEqual(1, len(User.objects.all()))
+    
