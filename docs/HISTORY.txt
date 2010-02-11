@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.1.2
+-----
+
+* Compatibility fixes for Django <1.2
+* The convert view is now itself lazy
+
 0.1.1
 -----
 
