@@ -64,10 +64,12 @@ class LazyTestCase(TestCase):
         self.assertEqual(200, response.status_code)
 
     def testDecoratedView(self):
-        # Calling our undecorated view should *not* create a user. If one is created, then the
+        # Calling our undecorated view should create a user. If one is created, then the
         # view will set the status code to 500.
+        self.assertEqual(0, len(User.objects.all()))
         response = self.client.get('/lazy/')
         self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(User.objects.all()))
         
     def testRemoteExpiredUsers(self):
         # Users wihout usable passwords who don't have a current session record should be removed.
