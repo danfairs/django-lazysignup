@@ -57,6 +57,17 @@ class LazyTestCase(TestCase):
         self.assertEqual(self.request.session.session_key[:30], self.request.user.username)
         self.assertEqual(False, self.request.user.has_usable_password())
         
+    @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
+    def testBannedUserAgents(self, mock_resolve):
+        # If the client's user agent matches a regex in the banned
+        # list, then a user shouldn't be created.
+        self.request.META['HTTP_USER_AGENT'] = 'search engine'
+        f = allow_lazy(lambda: 1)
+        mock_resolve.return_value = (f, None, None)
+        self.m.process_request(self.request)
+        self.failIf(hasattr(self.request, 'user'))
+        self.assertEqual(0, len(User.objects.all()))
+        
     def testNormalView(self):
         # Calling our undecorated view should *not* create a user. If one is created, then the
         # view will set the status code to 500.

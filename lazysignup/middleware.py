@@ -7,11 +7,18 @@ from django.contrib.auth.models import User
 USERNAME_LENGTH = 30
 
 ALLOW_LAZY_REGISTRY = {}
+USER_AGENT_BLACKLIST = []
 
 class LazySignupMiddleware(object):
     
     def process_request(self, request):
         assert hasattr(request, 'session'), "You need to have the session app installed"
+        
+        # If the user agent is one we ignore, bail early
+        request_user_agent = request.META.get('HTTP_USER_AGENT', '')
+        for user_agent in USER_AGENT_BLACKLIST:
+            if user_agent.search(request_user_agent):
+                return
         
         # Mimic what django.core.base.BaseHandler does to resolve the request URL to a
         # callable

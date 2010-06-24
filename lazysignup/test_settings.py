@@ -29,6 +29,9 @@ MIDDLEWARE_CLASSES = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
 ]
 
+LAZYSIGNUP_USER_AGENT_BLACKLIST = [
+    "^search",
+]
 
 # This merely needs to be present - as long as your test case specifies a
 # urls attribute, it does not need to be populated.
