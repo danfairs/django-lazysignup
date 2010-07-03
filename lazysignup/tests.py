@@ -2,6 +2,9 @@ import datetime
 
 from django.http import HttpRequest
 from django.contrib.auth import SESSION_KEY
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import User
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sessions.models import Session
@@ -41,11 +44,25 @@ class LazyTestCase(TestCase):
     def testSessionAlreadyExists(self, mock_resolve):
         # If the user id is already in the session, this middleware should do nothing.
         f = allow_lazy(lambda: 1)
-        self.request.session[SESSION_KEY] = 1
+        user = User.objects.create_user('test', 'test@test.com', 'test')
+        self.request.user = AnonymousUser()
+        login(self.request, authenticate(username='test', password='test'))
         mock_resolve.return_value = (f, None, None)
         
         self.m.process_request(self.request)
-        self.failIf(hasattr(self.request, 'user'))
+        self.assertEqual(user, self.request.user)
+
+    @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
+    def testBadSessionAlreadyExists(self, mock_resolve):
+        # If the user id is already in the session, but the user doesn't exist,
+        # then a user should be created
+        f = allow_lazy(lambda: 1)
+        self.request.session[SESSION_KEY] = 1000
+        mock_resolve.return_value = (f, None, None)
+        
+        self.m.process_request(self.request)
+        self.assertEqual(self.request.session.session_key[:30], self.request.user.username)
+        self.assertEqual(False, self.request.user.has_usable_password())
         
     @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
     def testCreateLazyUser(self, mock_resolve):

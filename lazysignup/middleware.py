@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth import authenticate
+from django.contrib.auth import get_user
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 
@@ -47,10 +48,11 @@ class LazySignupMiddleware(object):
         # See if this view has been registered as one to skip user creation
         if not ALLOW_LAZY_REGISTRY.has_key(callback):
             return 
-                    
-        # If there's already a key in the session for the user, then we don't 
-        # need to do anything
-        if request.session.has_key(SESSION_KEY):
+        
+        # If there's already a key in the session for a valid user, then we don't 
+        # need to do anything. If the user isn't valid, then get_user will return
+        # an anonymous user.
+        if not get_user(request).is_anonymous():
             return
             
         # If not, then we have to create a user, and log them in. Set the user id
