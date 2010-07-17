@@ -2,6 +2,24 @@
 Changelog
 =========
 
+0.2.0
+-----
+
+This version fixes a number of issues:
+
+  - Correct a duplicated test
+  - Fix a bug where a new user would not be created if they already had a
+    session key.
+    
+It also introduces a new feature, user agent blacklisting. This aims to
+prevent explosive growth in the number of users created by search engines,
+etc. This feature is still in test, so patches and feedback welcome. Note that
+this introduces a backwards-incompatibly behaviour. Prior to this release,
+it was safe to assume that all views marked with the ``@allow_lazy`` decorator
+would receive an authenticated. This is now no longer the case.
+
+See the README.rst file for more information.
+
 0.1.2
 -----
 

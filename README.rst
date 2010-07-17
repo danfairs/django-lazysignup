@@ -5,24 +5,24 @@ Introduction
 site as if they were authenticated users, but without signing up. At any time, 
 they can convert their temporary user account to a real user account.
 
-``django-lazysignup`` is alpha software. Bug reports, patches and extensions
+``django-lazysignup`` is beta software. Bug reports, patches and extensions
 are welcomed.
 
 Requirements
 ============
 
-Tested on Django 1.2alpha1, though should work on Django 1.0 and later 
+Tested on Django 1.2.x, though should work on Django 1.0 and later 
 (although you  will need to customise one of the templates.) It requires 
 ``django.contrib.auth`` to be in the ``INSTALLED_APPS`` list.
 
 Installation
 ============
 
-Install the django-lazysignup egg as you would any other development egg from 
-a source control system. For example, with pip::
+django-lazysignup can be installed with your favourite package management tool
+from PyPI::
 
-  pip install -e git://github.com/danfairs/django-lazysignup.git#egg=django-lazysignup
-  
+  pip install django-lazysignup
+
 Once that's done, you need to add ``lazysignup`` to your ``INSTALLED_APPS``. 
 You will also need to add ``lazysignup``'s authentication backend to your 
 site's ``AUTHENTICATION_BACKENDS`` setting::
@@ -84,8 +84,7 @@ The ``allow_lazy`` decorator
 ----------------------------
 
 Use this decorator to indicate that accessing the view should cause anonymous
-users to have temporary accounts created for them. It's probably unwise to put
-this on your homepage view!
+users to have temporary accounts created for them. 
 
 For example::
 
@@ -99,6 +98,27 @@ For example::
 When accessing the above view, a very simple response containing the generated
 username will be displayed. 
 
+User agent blacklisting
+-----------------------
+
+The middleware will not created users for certain requests from blacklisted
+user agents. This is simply a fairly crude method for preventing many spurious
+users being created by passing search engines.
+
+The blacklist is specified with the ``USER_AGENT_BLACKLIST`` setting. This
+should be an iterable of regular expression strings. If the user agent string 
+of a request matches a regex (``search()`` is used, so the match can be anywhere
+in the string) then a user will not be created.
+
+If the list is not specified, then the default is as follows
+
+  - slurp
+  - googlebot
+  - yandex
+  - msnbot
+  - baiduspider
+  
+Specifying your own ``USER_AGENT_BLACKLIST`` will replace this list.
 
 Using the convert view
 ----------------------
@@ -107,7 +127,6 @@ Users will be able to visit the ``/convert/`` view. This provides a form with
 a username, password and password confirmation. As long as they fill in valid
 details, their temporary user account will be converted into a real user 
 account that they can log in with as usual.
-
 
 Maintenance
 -----------
@@ -125,6 +144,8 @@ This works be removing user accounts from the system whose associated sessions
 are no longer in the session table. ``user.delete()`` is called for each user,
 so related data will be removed as well.
 
+Note of course that these deletes will cascade, so if you need to keep data 
+associated with such users, you'll need to write your own cleanup job.
 
 Helping Out
 -----------
