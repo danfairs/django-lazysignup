@@ -81,7 +81,7 @@ A Django management command is provided to clear out stale, uncoverted user
 accounts. 
 
 The ``allow_lazy_user`` decorator
-----------------------------
+---------------------------------
 
 Use this decorator to indicate that accessing the view should cause anonymous
 users to have temporary accounts created for them. 
