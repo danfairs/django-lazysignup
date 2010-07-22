@@ -12,9 +12,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from lazysignup.decorators import allow_lazy
+from lazysignup.decorators import allow_lazy_user
 
-@allow_lazy
+@allow_lazy_user
 def convert(request, form_class=UserCreationForm, redirect_field_name='redirect_to'):
     """ Convert a temporary user to a real one. Reject users who don't
     appear to be temporary users (ie. they have a usable password)

@@ -63,7 +63,7 @@ Usage
 
 The package works by creating temporary user accounts based on a user's 
 session key whenever a flagged view is requested. You can specify which
-views trigger this behaviour using the ``lazysignup.decorators.allow_lazy``
+views trigger this behaviour using the ``lazysignup.decorators.allow_lazy_user``
 decorator.
 
 When an anonymous user requests such a view, a temporary user account will be 
@@ -80,7 +80,7 @@ a real user account by providing a username and a password.
 A Django management command is provided to clear out stale, uncoverted user
 accounts. 
 
-The ``allow_lazy`` decorator
+The ``allow_lazy_user`` decorator
 ----------------------------
 
 Use this decorator to indicate that accessing the view should cause anonymous
@@ -89,9 +89,9 @@ users to have temporary accounts created for them.
 For example::
 
   from django.http import HttpResponse
-  from lazysignup.decorators import allow_lazy
+  from lazysignup.decorators import allow_lazy_user
   
-  @allow_lazy
+  @allow_lazy_user
   def my_view(request):
     return HttpResponse(request.user.username)
 

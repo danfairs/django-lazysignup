@@ -12,7 +12,7 @@ from django.test import TestCase
 
 import mock
 
-from lazysignup.decorators import allow_lazy
+from lazysignup.decorators import allow_lazy_user
 from lazysignup.middleware import LazySignupMiddleware
 from lazysignup.management.commands import remove_expired_users
 
@@ -29,7 +29,7 @@ def lazy_view(request):
     if request.user.has_usable_password() or request.user.is_anonymous():
         r.status_code = 500
     return r
-lazy_view = allow_lazy(lazy_view)
+lazy_view = allow_lazy_user(lazy_view)
 
 class LazyTestCase(TestCase):
 
@@ -43,7 +43,7 @@ class LazyTestCase(TestCase):
     @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
     def testSessionAlreadyExists(self, mock_resolve):
         # If the user id is already in the session, this middleware should do nothing.
-        f = allow_lazy(lambda: 1)
+        f = allow_lazy_user(lambda: 1)
         user = User.objects.create_user('test', 'test@test.com', 'test')
         self.request.user = AnonymousUser()
         login(self.request, authenticate(username='test', password='test'))
@@ -56,7 +56,7 @@ class LazyTestCase(TestCase):
     def testBadSessionAlreadyExists(self, mock_resolve):
         # If the user id is already in the session, but the user doesn't exist,
         # then a user should be created
-        f = allow_lazy(lambda: 1)
+        f = allow_lazy_user(lambda: 1)
         self.request.session[SESSION_KEY] = 1000
         mock_resolve.return_value = (f, None, None)
         
@@ -68,7 +68,7 @@ class LazyTestCase(TestCase):
     def testCreateLazyUser(self, mock_resolve):
         # If there isn't a setup session, then this middleware should create a user
         # with the same name as the session key, and an unusable password.
-        f = allow_lazy(lambda: 1)
+        f = allow_lazy_user(lambda: 1)
         mock_resolve.return_value = (f, None, None)
         self.m.process_request(self.request)
         self.assertEqual(self.request.session.session_key[:30], self.request.user.username)
@@ -79,7 +79,7 @@ class LazyTestCase(TestCase):
         # If the client's user agent matches a regex in the banned
         # list, then a user shouldn't be created.
         self.request.META['HTTP_USER_AGENT'] = 'search engine'
-        f = allow_lazy(lambda: 1)
+        f = allow_lazy_user(lambda: 1)
         mock_resolve.return_value = (f, None, None)
         self.m.process_request(self.request)
         self.failIf(hasattr(self.request, 'user'))

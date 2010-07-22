@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.3.0
+-----
+
+This version introduces a backwards-incompatible changes, renaming the ``@allow_lazy``
+decorator to ``@allow_lazy_user``. This is to avoid confusion with the decorator of
+the same name in ``django.utils.functional``.
+
 0.2.0
 -----
 
@@ -16,7 +23,7 @@ prevent explosive growth in the number of users created by search engines,
 etc. This feature is still in test, so patches and feedback welcome. Note that
 this introduces a backwards-incompatibly behaviour. Prior to this release,
 it was safe to assume that all views marked with the ``@allow_lazy`` decorator
-would receive an authenticated. This is now no longer the case.
+would receive an authenticated user. This is now no longer the case.
 
 See the README.rst file for more information.
 
