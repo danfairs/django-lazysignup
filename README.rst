@@ -147,6 +147,17 @@ so related data will be removed as well.
 Note of course that these deletes will cascade, so if you need to keep data 
 associated with such users, you'll need to write your own cleanup job.
 
+To Do
+-----
+
+There are a number of things on the to-do list:
+
+  - Change the way random usernames are generated. It's currently too easy to
+    accidentally display a username for a generated user on a site, which 
+    can give away a large part of a session identifier.
+  - Refactor the convert view so it's not hardcoded to expect particular fields
+    in the form for the new user.
+
 Helping Out
 -----------
 
