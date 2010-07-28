@@ -5,8 +5,10 @@ Introduction
 site as if they were authenticated users, but without signing up. At any time, 
 they can convert their temporary user account to a real user account.
 
-``django-lazysignup`` is beta software. Bug reports, patches and extensions
-are welcomed.
+``django-lazysignup`` is alpha software. Bug reports, patches and extensions
+are welcomed. While this package is in alpha, changes may be made in second-dot
+point releases without regards to backwards compatibility. This will change when
+the software stabilises.
 
 Requirements
 ============
@@ -98,6 +100,27 @@ For example::
 When accessing the above view, a very simple response containing the generated
 username will be displayed. 
 
+Currently, the ``allow_lazy_user`` decorator needs to be the last decorator
+applied to a view function - in other words, it needs to appear first in the
+decorator list. For example, this works::
+
+  @allow_lazy_user
+  @csrf_protect
+  @require_POST
+  def make(request):
+      pass
+      
+This will not work::
+
+  @csrf_protect
+  @require_POST
+  @allow_lazy_user
+  def make(request):
+      pass
+
+This is something that will be improved in a future version. Thanks to 
+Jauco Noordzij for pointing this out.
+
 User agent blacklisting
 -----------------------
 
@@ -159,6 +182,8 @@ There are a number of things on the to-do list:
     can give away a large part of a session identifier.
   - Refactor the convert view so it's not hardcoded to expect particular fields
     in the form for the new user.
+  - Remove the restriction on  the ``allow_lazy_user`` decorator being first in
+    the decorator list.
 
 Helping Out
 -----------
