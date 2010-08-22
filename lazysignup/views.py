@@ -17,7 +17,8 @@ from django.contrib.auth.models import User
 from lazysignup.decorators import allow_lazy_user
 
 @allow_lazy_user
-def convert(request, form_class=UserCreationForm, redirect_field_name='redirect_to'):
+def convert(request, form_class=UserCreationForm, redirect_field_name='redirect_to',
+            anonymous_redirect=settings.LOGIN_URL):
     """ Convert a temporary user to a real one. Reject users who don't
     appear to be temporary users (ie. they have a usable password)
     """
@@ -25,7 +26,7 @@ def convert(request, form_class=UserCreationForm, redirect_field_name='redirect_
     
     # If we've got an anonymous user, redirect to login
     if request.user.is_anonymous():
-        return HttpResponseRedirect(settings.LOGIN_URL)
+        return HttpResponseRedirect(anonymous_redirect)
     
     if request.method == 'POST':
         redirect_to = request.POST.get(redirect_field_name) or redirect_to
