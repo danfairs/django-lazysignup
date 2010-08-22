@@ -2,6 +2,22 @@
 Changelog
 =========
 
+0.4.x
+-----
+
+This version fixes a number of issues and adds a new testing feature:
+
+  - Fix a RST issue in README
+  - Fix an issue where a POST to the convert view would break if the user was anonymous.
+    The convert view now redirects to the LOGIN_URL by default, parameterised in the view.
+    
+New feature:
+  - The tests module now includes a ``no_lazysignup`` decorator that you can apply to a 
+    method on your test case, which removes the lazy signup middleware for the duration
+    of that test only. This is useful for testing what happens when a view that is 
+    marked with with the ``allow_lazy_user`` decorator ends up with an anonymous user
+    (most commonly, when a search engine visits).
+
 0.3.0
 -----
 
