@@ -240,6 +240,14 @@ class LazyTestCase(TestCase):
         response = self.client.get('/convert/')
         self.assertEqual(200, response.status_code)
         
+    @no_lazysignup
+    def testConvertAnon(self):
+        # If the Convert view gets an anonymous user, it should redirect
+        # to the login page. Not much else it can do!
+        response = self.client.get('/convert/')
+        self.assertEqual(302, response.status_code)
+        self.assertEqual('http://testserver' + settings.LOGIN_URL, response['location'])
+        
     def testConversionKeepsSameUser(self):
         self.client.get('/lazy/')
         response = self.client.post('/convert/', {

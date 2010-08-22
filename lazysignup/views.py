@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.shortcuts import redirect
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
@@ -20,6 +22,10 @@ def convert(request, form_class=UserCreationForm, redirect_field_name='redirect_
     appear to be temporary users (ie. they have a usable password)
     """
     redirect_to = 'lazysignup_convert_done'
+    
+    # If we've got an anonymous user, redirect to login
+    if request.user.is_anonymous():
+        return HttpResponseRedirect(settings.LOGIN_URL)
     
     if request.method == 'POST':
         redirect_to = request.POST.get(redirect_field_name) or redirect_to
