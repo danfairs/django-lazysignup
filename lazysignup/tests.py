@@ -1,5 +1,7 @@
 import datetime
+from functools import wraps
 
+from django.conf import settings
 from django.http import HttpRequest
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth import authenticate
@@ -26,10 +28,25 @@ def view(request):
 def lazy_view(request):
     from django.http import HttpResponse
     r = HttpResponse()
-    if request.user.has_usable_password() or request.user.is_anonymous():
+    if request.user.is_anonymous() or  request.user.has_usable_password():
         r.status_code = 500
     return r
 lazy_view = allow_lazy_user(lazy_view)
+
+def no_lazysignup(func):
+    def wrapped(*args, **kwargs):
+        old = settings.MIDDLEWARE_CLASSES
+        settings.MIDDLEWARE_CLASSES = tuple(
+                [m for m in settings.MIDDLEWARE_CLASSES 
+                if m != 'lazysignup.middleware.LazySignupMiddleware']
+            )
+        try:
+            result = func(*args, **kwargs)
+        finally:
+            settings.MIDDLEWARE_CLASSES = old
+        return result
+    return wraps(func)(wrapped)
+        
 
 class LazyTestCase(TestCase):
 
@@ -231,4 +248,12 @@ class LazyTestCase(TestCase):
             'password2': 'password',
         })
         self.assertEqual(1, len(User.objects.all()))
+        
+    @no_lazysignup
+    def testNoLazysignupDecorator(self):
+        response = self.client.get('/lazy/')
+        self.assertEqual(500, response.status_code)
+        
+        
+        
     
