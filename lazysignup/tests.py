@@ -6,6 +6,7 @@ from django.http import HttpRequest
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import User
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -17,6 +18,17 @@ import mock
 from lazysignup.decorators import allow_lazy_user
 from lazysignup.middleware import LazySignupMiddleware
 from lazysignup.management.commands import remove_expired_users
+
+class GoodUserCreationForm(UserCreationForm):
+    """ Hardcoded credentials to demonstrate that the get_credentials method
+    is being used
+    """
+    def get_credentials(self):
+        return {
+            'username': 'demo',
+            'password': 'demo',
+        }
+
 
 def view(request):
     from django.http import HttpResponse
@@ -261,6 +273,26 @@ class LazyTestCase(TestCase):
     def testNoLazysignupDecorator(self):
         response = self.client.get('/lazy/')
         self.assertEqual(500, response.status_code)
+        
+    def testBadCustomConvertForm(self):
+        # Passing a form class to the conversion view that doesn't have
+        # a get_credentials method should raise an AttributeError
+        self.assertRaises(AttributeError, self.client.post, '/bad-custom-convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'password',
+        })
+        
+    def testGoodCustomConvertForm(self):
+        self.fail()
+        self.client.get('/lazy/')
+        response = self.client.post('/convert/', {
+            'username': 'foo',
+            'password1': 'password',
+            'password2': 'password',
+        })
+        
+        
         
         
         

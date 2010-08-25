@@ -11,10 +11,19 @@ from django.views.generic.simple import direct_to_template
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm as UserCreationFormBase
 from django.contrib.auth.models import User
 
 from lazysignup.decorators import allow_lazy_user
+
+class UserCreationForm(UserCreationFormBase):
+    
+    def get_credentials(self):
+        return {
+            'username': self.cleaned_data['username'],
+            'password': self.cleaned_data['password1']
+        }
+
 
 @allow_lazy_user
 def convert(request, form_class=UserCreationForm, redirect_field_name='redirect_to',
@@ -41,14 +50,11 @@ def convert(request, form_class=UserCreationForm, redirect_field_name='redirect_
         # Looks OK - proceed with validation.
         form = form_class(request.POST, instance=request.user)
         if form.is_valid():
-            user = form.save()
+            form.save()
         
             # Re-log the user in, as they'll now not be authenticatable with the Lazy 
             # backend
-            login(request, authenticate(
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password1'],
-                ))
+            login(request, authenticate(**form.get_credentials()))
         
             # If we're being called via AJAX, then we just return a 200 directly
             # to the client. If not, then we redirect to a confirmation page or
