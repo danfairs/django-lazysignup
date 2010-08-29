@@ -57,7 +57,7 @@ class LazySignupMiddleware(object):
             
         # If not, then we have to create a user, and log them in. Set the user id
         # in the session here to prevent the login call cycling the session key.
-        username = request.session.session_key[:USERNAME_LENGTH]
+        username = self.get_username(request.session.session_key)
 
         User.objects.create_user(username, '')
         request.user = None
@@ -66,5 +66,7 @@ class LazySignupMiddleware(object):
         request.session[SESSION_KEY] = user.id
         login(request, user)
 
+    def get_username(self, session_key):
+        return session_key[:USERNAME_LENGTH]
             
         
