@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import *
+from django.contrib.auth.forms import UserCreationForm
 from lazysignup.urls import urlpatterns
 
 from lazysignup.tests import GoodUserCreationForm
@@ -16,6 +17,6 @@ urlpatterns += patterns('lazysignup.views',
         'form_class': UserCreationForm
     }, name='test_bad_convert'),
     url(r'^good-custom-convert/$', 'convert', {
-        'form_class': UserCreationForm
+        'form_class': GoodUserCreationForm
     }, name='test_good_convert'),
 )

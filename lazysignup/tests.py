@@ -2,6 +2,7 @@ import datetime
 from functools import wraps
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import HttpRequest
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth import authenticate
@@ -28,6 +29,15 @@ class GoodUserCreationForm(UserCreationForm):
             'username': 'demo',
             'password': 'demo',
         }
+
+    def save(self, commit=True):
+        instance = super(GoodUserCreationForm, self).save(commit=False)
+        creds = self.get_credentials()
+        instance.username = creds['username']
+        instance.set_password(creds['password'])
+        if commit:
+            instance.save()
+        return instance
 
 
 def view(request):
@@ -277,22 +287,24 @@ class LazyTestCase(TestCase):
     def testBadCustomConvertForm(self):
         # Passing a form class to the conversion view that doesn't have
         # a get_credentials method should raise an AttributeError
-        self.assertRaises(AttributeError, self.client.post, '/bad-custom-convert/', {
+        self.assertRaises(AttributeError, self.client.post, reverse('test_bad_convert'), {
             'username': 'demo',
             'password1': 'password',
             'password2': 'password',
         })
         
     def testGoodCustomConvertForm(self):
-        self.fail()
         self.client.get('/lazy/')
-        response = self.client.post('/convert/', {
+        response = self.client.post(reverse('test_good_convert'), {
             'username': 'foo',
             'password1': 'password',
             'password2': 'password',
         })
+        users = User.objects.all()
+        self.assertEqual(1, len(users))
         
-        
+        # The credentials returned by get_credentials should have been used
+        self.assertEqual(users[0], authenticate(username='demo', password='demo'))
         
         
         
