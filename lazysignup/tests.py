@@ -100,7 +100,7 @@ class LazyTestCase(TestCase):
         mock_resolve.return_value = (f, None, None)
         
         self.m.process_request(self.request)
-        self.assertEqual(self.request.session.session_key[:30], self.request.user.username)
+        self.assertEqual(self.m.get_username(self.request.session.session_key), self.request.user.username)
         self.assertEqual(False, self.request.user.has_usable_password())
         
     @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
@@ -110,7 +110,7 @@ class LazyTestCase(TestCase):
         f = allow_lazy_user(lambda: 1)
         mock_resolve.return_value = (f, None, None)
         self.m.process_request(self.request)
-        self.assertEqual(self.request.session.session_key[:30], self.request.user.username)
+        self.assertEqual(self.m.get_username(self.request.session.session_key), self.request.user.username)
         self.assertEqual(False, self.request.user.has_usable_password())
         
     @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
