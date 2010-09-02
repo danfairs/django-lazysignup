@@ -151,6 +151,25 @@ a username, password and password confirmation. As long as they fill in valid
 details, their temporary user account will be converted into a real user 
 account that they can log in with as usual.
 
+You may pass your own form class into the `convert` view in order to customise
+user creation. The code requires expects the following:
+
+  - It expects to be able to create the form passing in the generated `User`
+    object with an `instance` kwarg (in general, this is fine when using a
+    ModelForm based on the User model)
+  - It expects to be able to call `save()` on the form to convert the user 
+    to a real user
+  - It expects to be able to call a `get_credentials()` method on the form
+    to obtain a set of credentials to authenticate the new user with. The
+    result of this call should be a dictionary suitable for passing to 
+    `django.contrib.auth.authenticate()`. Typically, this would be a dict
+    with `username` and `password` keys - but this may vary if you're using
+    a different authentication backend.
+    
+The default configuration, using the provided `UserCreationForm`, should
+be enough for most users, but the customisation point is there if you need
+it.
+
 Maintenance
 -----------
 
@@ -177,11 +196,6 @@ To Do
 
 There are a number of things on the to-do list:
 
-  - Change the way random usernames are generated. It's currently too easy to
-    accidentally display a username for a generated user on a site, which 
-    can give away a large part of a session identifier.
-  - Refactor the convert view so it's not hardcoded to expect particular fields
-    in the form for the new user.
   - Remove the restriction on  the ``allow_lazy_user`` decorator being first in
     the decorator list.
 

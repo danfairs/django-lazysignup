@@ -5,18 +5,33 @@ Changelog
 0.4.x
 -----
 
-This version fixes a number of issues and adds a new testing feature:
+This version fixes a number of issues, adds new features and has backwards-
+incompatible changes:
 
   - Fix a RST issue in README
   - Fix an issue where a POST to the convert view would break if the user was anonymous.
     The convert view now redirects to the LOGIN_URL by default, parameterised in the view.
     
-New feature:
+New features:
+
+  - It is now easier to customise the process of converting a lazy user into a real user.
+    Previous versions allowed a custom form to be passed to the `convert` view, but the
+    code always expected a `username` and `password1` field to get credentials from to 
+    log the user in. Now, a new `get_credentials()` method is called on the form to obtain
+    these credentials.
   - The tests module now includes a ``no_lazysignup`` decorator that you can apply to a 
     method on your test case, which removes the lazy signup middleware for the duration
     of that test only. This is useful for testing what happens when a view that is 
     marked with with the ``allow_lazy_user`` decorator ends up with an anonymous user
     (most commonly, when a search engine visits).
+
+Backwards-incompatible changes:
+
+  - Generated usernames are now based on the session key, rather than actually being the
+    session key. This is to avoid a potential security issue where an app might simply
+    display a username, giving away a significant part of the user's session key. The 
+    username is now generated from a SHA1 hash of the session key. This change means that
+    existing generated users will become invalid.
 
 0.3.0
 -----
