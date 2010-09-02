@@ -2,7 +2,7 @@
 Changelog
 =========
 
-0.4.x
+0.4.0
 -----
 
 This version fixes a number of issues, adds new features and has backwards-
