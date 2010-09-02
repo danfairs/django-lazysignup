@@ -15,9 +15,9 @@ incompatible changes:
 New features:
 
   - It is now easier to customise the process of converting a lazy user into a real user.
-    Previous versions allowed a custom form to be passed to the `convert` view, but the
-    code always expected a `username` and `password1` field to get credentials from to 
-    log the user in. Now, a new `get_credentials()` method is called on the form to obtain
+    Previous versions allowed a custom form to be passed to the ``convert`` view, but the
+    code always expected a ``username`` and ``password1`` field to get credentials from to 
+    log the user in. Now, a new ``get_credentials()`` method is called on the form to obtain
     these credentials.
   - The tests module now includes a ``no_lazysignup`` decorator that you can apply to a 
     method on your test case, which removes the lazy signup middleware for the duration

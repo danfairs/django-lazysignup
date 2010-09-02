@@ -154,19 +154,19 @@ account that they can log in with as usual.
 You may pass your own form class into the `convert` view in order to customise
 user creation. The code requires expects the following:
 
-  - It expects to be able to create the form passing in the generated `User`
-    object with an `instance` kwarg (in general, this is fine when using a
+  - It expects to be able to create the form passing in the generated ``User``
+    object with an ``instance`` kwarg (in general, this is fine when using a
     ModelForm based on the User model)
-  - It expects to be able to call `save()` on the form to convert the user 
+  - It expects to be able to call ``save()`` on the form to convert the user 
     to a real user
-  - It expects to be able to call a `get_credentials()` method on the form
+  - It expects to be able to call a ``get_credentials()`` method on the form
     to obtain a set of credentials to authenticate the new user with. The
     result of this call should be a dictionary suitable for passing to 
-    `django.contrib.auth.authenticate()`. Typically, this would be a dict
-    with `username` and `password` keys - but this may vary if you're using
+    ``django.contrib.auth.authenticate()``. Typically, this would be a dict
+    with ``username`` and ``password`` keys - but this may vary if you're using
     a different authentication backend.
     
-The default configuration, using the provided `UserCreationForm`, should
+The default configuration, using the provided ``UserCreationForm``, should
 be enough for most users, but the customisation point is there if you need
 it.
 
