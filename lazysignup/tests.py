@@ -20,6 +20,8 @@ from lazysignup.decorators import allow_lazy_user
 from lazysignup.middleware import LazySignupMiddleware
 from lazysignup.management.commands import remove_expired_users
 
+from lazysignup.middleware import username_from_session
+
 class GoodUserCreationForm(UserCreationForm):
     """ Hardcoded credentials to demonstrate that the get_credentials method
     is being used
@@ -140,7 +142,7 @@ class LazyTestCase(TestCase):
         
     def testRemoveExpiredUsers(self):
         # Users wihout usable passwords who don't have a current session record should be removed.
-        u1 = User.objects.create_user('dummy', '')
+        u1 = User.objects.create_user(username_from_session('dummy'), '')
         u2 = User.objects.create_user('dummy2', '')
         s = Session(
             session_key='dummy',
@@ -305,6 +307,15 @@ class LazyTestCase(TestCase):
         
         # The credentials returned by get_credentials should have been used
         self.assertEqual(users[0], authenticate(username='demo', password='demo'))
+        
+    def testUsernameNotBasedOnSessionKey(self):
+        # The generated username should not look like the session key. While doing
+        # so isn't a security problem in itself, any client software that blindly
+        # displays the logged-in user's username risks showing most of the session
+        # key to the world.
+        fake_session_key = 'a' * 32
+        username = self.m.get_username(fake_session_key)
+        self.failIf(fake_session_key.startswith(username))
         
         
         

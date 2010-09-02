@@ -1,3 +1,4 @@
+import hashlib
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth import authenticate
@@ -5,10 +6,14 @@ from django.contrib.auth import get_user
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 
-USERNAME_LENGTH = 30
-
 ALLOW_LAZY_REGISTRY = {}
 USER_AGENT_BLACKLIST = []
+
+def username_from_session(session_key, username_length=None):
+    if not username_length:
+        username_length = User._meta.get_field('username').max_length
+    return hashlib.sha1(session_key).hexdigest()[:username_length]
+
 
 class LazySignupMiddleware(object):
     
@@ -66,7 +71,6 @@ class LazySignupMiddleware(object):
         request.session[SESSION_KEY] = user.id
         login(request, user)
 
-    def get_username(self, session_key):
-        return session_key[:USERNAME_LENGTH]
-            
+    def get_username(self, session_key, username_length=None):
+        return username_from_session(session_key, username_length)
         
