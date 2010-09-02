@@ -138,7 +138,7 @@ class LazyTestCase(TestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(User.objects.all()))
         
-    def testRemoteExpiredUsers(self):
+    def testRemoveExpiredUsers(self):
         # Users wihout usable passwords who don't have a current session record should be removed.
         u1 = User.objects.create_user('dummy', '')
         u2 = User.objects.create_user('dummy2', '')
