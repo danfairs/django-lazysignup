@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '0.4.0'
+version = '0.5.0'
 
 setup(name='django-lazysignup',
       version=version,
@@ -13,7 +13,7 @@ setup(name='django-lazysignup',
         "Programming Language :: Python",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Framework :: Django",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "License :: OSI Approved :: BSD License"
         ],
       keywords='django lazy signup app user',
