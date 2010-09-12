@@ -2,6 +2,26 @@
 Changelog
 =========
 
+0.5.0
+-----
+
+This version simplifies the implementation significantly by removing the requirement for
+a middleware. This is a backwards-incompatible change as the ``lazysignup.middleware``
+module no longer exists, and needs to be removed from your ``MIDDLEWARE_CLASSES`` list.
+
+This change means that you can no longer disable the software by removing the middleware
+class from your configuration. You might want to do this temporarily in development, for
+example, when testing that your views still work when an anonymous user is presented to 
+them (perhaps through the user agent blacklisting functionality).
+
+To this end, support for a new settings has been added: ``ENABLE_LAZYSIGNUP``. It's set
+to True by default. Setting it to False will both prevent automatic login and 
+automatic user creation.
+
+The ``allow_lazy_user`` decorator no longer has to be first in the decorator list. Thanks
+to Jauco Noordzij for pointing this out initially.
+
+
 0.4.0
 -----
 

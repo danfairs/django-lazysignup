@@ -5,10 +5,9 @@ Introduction
 site as if they were authenticated users, but without signing up. At any time, 
 they can convert their temporary user account to a real user account.
 
-``django-lazysignup`` is alpha software. Bug reports, patches and extensions
-are welcomed. While this package is in alpha, changes may be made in second-dot
-point releases without regards to backwards compatibility. This will change when
-the software stabilises.
+``django-lazysignup`` is beta software. Bug reports, patches and extensions
+are welcomed. While this package is in beta, backwards-compatibility will be
+maintained for a single point release and a DeprecationWarning issued.
 
 Requirements
 ============
@@ -34,20 +33,6 @@ site's ``AUTHENTICATION_BACKENDS`` setting::
     'lazysignup.backends.LazySignupBackend',
   )
   
-You'll also need the middleware installed. It should come between the session
-and auth backends::
-
-  MIDDLEWARE_CLASSES = (
-      "django.middleware.common.CommonMiddleware",
-      "django.contrib.sessions.middleware.SessionMiddleware",
-      "django.middleware.csrf.CsrfViewMiddleware",
-      "lazysignup.middleware.LazySignupMiddleware",
-      "django.contrib.auth.middleware.AuthenticationMiddleware",
-      "django.contrib.messages.middleware.MessageMiddleware",
-      "django.middleware.doc.XViewMiddleware",
-  )
-  
-
 If you are using Django prior to 1.2, you should override the 
 ``lazysignup/convert.html``  template to remove the ``{% csrf_token %}`` 
 template tag. This may be handled more elegantly in a future release.
@@ -99,27 +84,6 @@ For example::
 
 When accessing the above view, a very simple response containing the generated
 username will be displayed. 
-
-Currently, the ``allow_lazy_user`` decorator needs to be the last decorator
-applied to a view function - in other words, it needs to appear first in the
-decorator list. For example, this works::
-
-  @allow_lazy_user
-  @csrf_protect
-  @require_POST
-  def make(request):
-      pass
-      
-This will not work::
-
-  @csrf_protect
-  @require_POST
-  @allow_lazy_user
-  def make(request):
-      pass
-
-This is something that will be improved in a future version. Thanks to 
-Jauco Noordzij for pointing this out.
 
 User agent blacklisting
 -----------------------
