@@ -4,7 +4,7 @@ from django.contrib.auth.models import UNUSABLE_PASSWORD
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 
-from lazysignup.middleware import username_from_session
+from lazysignup.utils import username_from_session
 
 class Command(NoArgsCommand):
     help = u"Remove all users whose sessions have expired and who haven't set a password"

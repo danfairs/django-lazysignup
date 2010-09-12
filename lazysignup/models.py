@@ -1,7 +1,7 @@
 import re
 from django.conf import settings
 
-from lazysignup.middleware import USER_AGENT_BLACKLIST
+from lazysignup.decorators import USER_AGENT_BLACKLIST
 
 DEFAULT_BLACKLIST = (
     'slurp',
