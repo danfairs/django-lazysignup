@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sessions.models import Session
 from django.test import TestCase
+from django.views.decorators.http import require_POST
 
 import mock
 
@@ -319,6 +320,17 @@ class LazyTestCase(TestCase):
         fake_session_key = 'a' * 32
         username = username_from_session(fake_session_key)
         self.failIf(fake_session_key.startswith(username))
+        
+    def testDecoratorOrder(self):
+        # It used to be the case that allow_lazy_user had to be first in the
+        # decorator list. This is no longer the case.
+        self.request.user = AnonymousUser()
+        self.request.method = 'POST'
+        v = require_POST(lazy_view)
+        
+        response = v(self.request)
+        self.assertEqual(200, response.status_code)
+        
         
         
         
