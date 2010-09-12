@@ -155,14 +155,6 @@ associated with such users, you'll need to write your own cleanup job. It also
 expects that you're using database backed sessions. If that's not the case, then
 you'll again need to write your own cleanup.
 
-To Do
------
-
-There are a number of things on the to-do list:
-
-  - Remove the restriction on  the ``allow_lazy_user`` decorator being first in
-    the decorator list.
-
 Helping Out
 -----------
 
