@@ -20,6 +20,7 @@ import mock
 from lazysignup.decorators import allow_lazy_user
 from lazysignup.management.commands import remove_expired_users
 
+from lazysignup.utils import is_lazy_user
 from lazysignup.utils import username_from_session
 
 class GoodUserCreationForm(UserCreationForm):
@@ -298,7 +299,7 @@ class LazyTestCase(TestCase):
             'password1': 'password',
             'password2': 'password',
         })
-        
+
     def testGoodCustomConvertForm(self):
         self.client.get('/lazy/')
         response = self.client.post(reverse('test_good_convert'), {
@@ -331,7 +332,21 @@ class LazyTestCase(TestCase):
         response = v(self.request)
         self.assertEqual(200, response.status_code)
         
-        
-        
+    def testIsLazyUserAnonymous(self):
+        user = AnonymousUser()
+        self.assertEqual(False, is_lazy_user(user))
+
+    def testIsLazyUserModelBackend(self):
+        user = User.objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
+        self.assertEqual(False, is_lazy_user(user))
+
+    def testIsLazyUserModelUnusablePassword(self):
+        user = User.objects.create_user('dummy', 'dummy@dummy.com')
+        self.assertEqual(False, is_lazy_user(user))
+
+    def testIsLazyUserLazy(self):
+        self.request.user = AnonymousUser()
+        response = lazy_view(self.request)
+        self.assertEqual(True, is_lazy_user(self.request.user))
         
     
