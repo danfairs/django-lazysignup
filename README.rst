@@ -65,7 +65,10 @@ A view is provided to allow such users to convert their temporary account into
 a real user account by providing a username and a password.
 
 A Django management command is provided to clear out stale, uncoverted user
-accounts. 
+accounts - although this depends on your use of database-backed sessions, and
+assumes that all user accounts with an expired session are safe to delete. This
+may not be the case for all apps, so you may wish to provide your own cleaning
+script. 
 
 The ``allow_lazy_user`` decorator
 ---------------------------------
