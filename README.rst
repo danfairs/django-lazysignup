@@ -56,10 +56,11 @@ decorator.
 When an anonymous user requests such a view, a temporary user account will be 
 created for them, and they will be logged in. The user account will have
 an unusable password set, so that it can't be used to log in as a regular
-user. Hence, the way to tell a regular use from a temporary user is to call
-the ``user.has_usable_password()`` method. If this returns ``False``, then the
-user is temporary. Note that ``user.is_anonymous()`` will return ``False`` 
-and ``user.is_authenticated()`` will return ``True``.
+user. The way to tell a regular use from a temporary user is to call
+the ``is_lazy_user()`` function from ``lazysignup.templatetags.lazysignup_tags``. 
+If this returns ``True``, then the user is temporary. Note that 
+``user.is_anonymous()`` will return ``False``  and ``user.is_authenticated()`` 
+will return ``True``. See below for more information on ``is_lazy_user``.
 
 A view is provided to allow such users to convert their temporary account into
 a real user account by providing a username and a password.
@@ -88,6 +89,35 @@ For example::
 When accessing the above view, a very simple response containing the generated
 username will be displayed. 
 
+The ``is_lazy_user`` template filter
+------------------------------------
+
+This template filter (which can also be imported directly and used in your view
+code) will return True if the user is a generated user. You need to pass it the
+user to test. For example, a site navigation template might look like this::
+
+    {% load i18n lazysignup_tags %}
+    
+    <nav id="account-bar">
+      <ul>
+        <li><a href="{% url home %}">{% trans "Home" %}</a></li>
+        {% if not user|is_lazy_user %}
+          <li><a href="#">{% trans "Account" %}</a></li>
+          <li><a href="{% url auth_logout %}">{% trans "Log out" %}</a></li>
+        {% else %}
+          <li><a href="{% url lazysignup_convert %}">{% trans "Save your data" %}</a> {% trans "by setting a username and password" %}</li>
+        {% endif %}
+      </ul>
+    </nav>
+
+This filter is very simple, and can be used directly in view code, or tests. For example::
+
+    from lazysignup.templatetags.lazysignup_tags import is_lazy_user
+    
+    def testIsLazyUserAnonymous(self):
+        user = AnonymousUser()
+        self.assertEqual(False, is_lazy_user(user))
+    
 User agent blacklisting
 -----------------------
 

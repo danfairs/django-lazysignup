@@ -21,6 +21,18 @@ automatic user creation.
 The ``allow_lazy_user`` decorator no longer has to be first in the decorator list. Thanks
 to Jauco Noordzij for pointing this out initially.
 
+There is now also an ``is_lazy_user`` template filter, which will return True if the
+current user is an automatically created user. It will return False for users who are
+anonymous, or were authenticated by some other means. Thanks again to Jauco Noordzij
+for the idea for this feature.
+
+Note that the ``is_lazy_user`` filter (which you can also just import and use 
+directly in your view code) is the preferred way of checking for an automatically
+created user. ``has_usable_password`` will continue to return False for such users,
+but is no longer the canonical way to identify them. Users authenticated with
+other authentication backends (for example, LDAP backends) may return False when
+``has_usable_password`` is called.
+
 
 0.4.0
 -----
