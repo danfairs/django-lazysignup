@@ -20,8 +20,8 @@ import mock
 from lazysignup.decorators import allow_lazy_user
 from lazysignup.management.commands import remove_expired_users
 
-from lazysignup.utils import is_lazy_user
 from lazysignup.utils import username_from_session
+from lazysignup.templatetags.lazysignup_tags import is_lazy_user
 
 class GoodUserCreationForm(UserCreationForm):
     """ Hardcoded credentials to demonstrate that the get_credentials method
@@ -349,4 +349,5 @@ class LazyTestCase(TestCase):
         response = lazy_view(self.request)
         self.assertEqual(True, is_lazy_user(self.request.user))
         
+    
     
