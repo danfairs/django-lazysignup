@@ -17,6 +17,7 @@ from django.views.decorators.http import require_POST
 
 import mock
 
+from lazysignup.backends import LazySignupBackend
 from lazysignup.decorators import allow_lazy_user
 from lazysignup.management.commands import remove_expired_users
 
@@ -348,6 +349,15 @@ class LazyTestCase(TestCase):
         self.request.user = AnonymousUser()
         response = lazy_view(self.request)
         self.assertEqual(True, is_lazy_user(self.request.user))
+        
+    def testBackendGetUserAnnotates(self):
+        # Check that the lazysignup backend annotates the user object
+        # with the backend, mirroring what Django's does
+        lazy_view(self.request)
+        backend = LazySignupBackend()
+        pk = User.objects.all()[0].pk
+        self.assertEqual('lazysignup.backends.LazySignupBackend', backend.get_user(pk).backend)
+        
         
     
     
