@@ -28,11 +28,10 @@ def allow_lazy_user(func):
             # need to do anything. If the user isn't valid, then get_user will return
             # an anonymous user
             if get_user(request).is_anonymous() and not ignore:
-                # If not, then we have to create a user, and log them in. Set the user id
-                # in the session here to prevent the login call cycling the session key.
+                # If not, then we have to create a user, and log them in.
+                from lazysignup.models import LazyUser
                 username = username_from_session(request.session.session_key)
-
-                User.objects.create_user(username, '')
+                user = LazyUser.objects.create_lazy_user(username)
                 request.user = None
                 user = authenticate(username=username)
                 assert user, ("Lazy user creation and authentication "

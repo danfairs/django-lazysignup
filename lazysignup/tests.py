@@ -20,7 +20,7 @@ import mock
 from lazysignup.backends import LazySignupBackend
 from lazysignup.decorators import allow_lazy_user
 from lazysignup.management.commands import remove_expired_users
-
+from lazysignup.models import LazyUser
 from lazysignup.utils import username_from_session
 from lazysignup.templatetags.lazysignup_tags import is_lazy_user
 
@@ -349,6 +349,16 @@ class LazyTestCase(TestCase):
         self.request.user = AnonymousUser()
         response = lazy_view(self.request)
         self.assertEqual(True, is_lazy_user(self.request.user))
+
+    def testLazyUserNotLoggedIn(self):
+        # Check that the is_lazy_user works for users who were created
+        # lazily but are not the current logged-in user
+        user = LazyUser.objects.create_lazy_user('foo')
+        self.assertTrue(is_lazy_user(user))
+
+    def testAnonymousNotLazy(self):
+        # Anonymous users are not lazy
+        self.assertFalse(is_lazy_user(AnonymousUser()))
 
     def testBackendGetUserAnnotates(self):
         # Check that the lazysignup backend annotates the user object
