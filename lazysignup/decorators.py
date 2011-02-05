@@ -13,8 +13,8 @@ USER_AGENT_BLACKLIST = []
 
 def allow_lazy_user(func):
     def wrapped(request, *args, **kwargs):
-        assert hasattr(request, 'session'), "You need to have the session app intsalled"
-
+        assert hasattr(request, 'session'), ("You need to have the session "
+                                             "app intsalled")
         if getattr(settings, 'LAZYSIGNUP_ENABLE', True):
             # If the user agent is one we ignore, bail early
             ignore = False
@@ -35,7 +35,12 @@ def allow_lazy_user(func):
                 User.objects.create_user(username, '')
                 request.user = None
                 user = authenticate(username=username)
-                assert user, "Lazy user creation and authentication failed. Have you got lazysignup.backends.LazySignupBackend in AUTHENTICATION_BACKENDS?"
+                assert user, ("Lazy user creation and authentication "
+                              "failed. Have you got "
+                              "lazysignup.backends.LazySignupBackend in "
+                              "AUTHENTICATION_BACKENDS?")
+                # Set the user id in the session here to prevent the login
+                # call cycling the session key.
                 request.session[SESSION_KEY] = user.id
                 login(request, user)
         return func(request, *args, **kwargs)
