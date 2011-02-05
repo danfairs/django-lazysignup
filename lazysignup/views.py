@@ -15,15 +15,7 @@ from django.contrib.auth.forms import UserCreationForm as UserCreationFormBase
 from django.contrib.auth.models import User
 
 from lazysignup.decorators import allow_lazy_user
-
-class UserCreationForm(UserCreationFormBase):
-
-    def get_credentials(self):
-        return {
-            'username': self.cleaned_data['username'],
-            'password': self.cleaned_data['password1']
-        }
-
+from lazysignup.forms import UserCreationForm
 
 @allow_lazy_user
 def convert(request, form_class=UserCreationForm, redirect_field_name='redirect_to',
