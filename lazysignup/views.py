@@ -11,11 +11,12 @@ from django.views.generic.simple import direct_to_template
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm as UserCreationFormBase
 from django.contrib.auth.models import User
 
 from lazysignup.decorators import allow_lazy_user
+from lazysignup.exceptions import NotLazyError
 from lazysignup.forms import UserCreationForm
+from lazysignup.models import LazyUser
 
 @allow_lazy_user
 def convert(request, form_class=UserCreationForm, redirect_field_name='redirect_to',
@@ -31,18 +32,17 @@ def convert(request, form_class=UserCreationForm, redirect_field_name='redirect_
 
     if request.method == 'POST':
         redirect_to = request.POST.get(redirect_field_name) or redirect_to
-        # If the user already has a usable password, return a Bad Request to
-        # an Ajax client, or just redirect back for a regular client.
-        if request.user.has_usable_password():
-            if request.is_ajax():
-                return HttpResponseBadRequest(content=_(u"Already converted."))
-            else:
-                return redirect(redirect_to)
-
-        # Looks OK - proceed with validation.
         form = form_class(request.POST, instance=request.user)
         if form.is_valid():
-            form.save()
+            try:
+                user = LazyUser.objects.convert(form)
+            except NotLazyError:
+                # If the user already has a usable password, return a Bad Request to
+                # an Ajax client, or just redirect back for a regular client.
+                if request.is_ajax():
+                    return HttpResponseBadRequest(content=_(u"Already converted."))
+                else:
+                    return redirect(redirect_to)
 
             # Re-log the user in, as they'll now not be authenticatable with the Lazy
             # backend

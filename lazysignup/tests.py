@@ -19,10 +19,10 @@ import mock
 
 from lazysignup.backends import LazySignupBackend
 from lazysignup.decorators import allow_lazy_user
+from lazysignup.exceptions import NotLazyError
 from lazysignup.management.commands import remove_expired_users
 from lazysignup.models import LazyUser
-from lazysignup.utils import username_from_session
-from lazysignup.templatetags.lazysignup_tags import is_lazy_user
+from lazysignup.utils import is_lazy_user, username_from_session
 
 class GoodUserCreationForm(UserCreationForm):
     """ Hardcoded credentials to demonstrate that the get_credentials method
@@ -310,9 +310,13 @@ class LazyTestCase(TestCase):
         })
         users = User.objects.all()
         self.assertEqual(1, len(users))
+        user = users[0]
 
         # The credentials returned by get_credentials should have been used
-        self.assertEqual(users[0], authenticate(username='demo', password='demo'))
+        self.assertEqual(user, authenticate(username='demo', password='demo'))
+
+        # The user should no longer be lazy
+        self.assertFalse(is_lazy_user(user))
 
     def testUsernameNotBasedOnSessionKey(self):
         # The generated username should not look like the session key. While doing
@@ -368,6 +372,26 @@ class LazyTestCase(TestCase):
         pk = User.objects.all()[0].pk
         self.assertEqual('lazysignup.backends.LazySignupBackend', backend.get_user(pk).backend)
 
+    def testConvertGood(self):
+        # Check that the convert() method on the lazy user manager
+        # correctly converts the lazy user
+        user = LazyUser.objects.create_lazy_user('foo')
+        d = {
+            'username': 'test',
+            'password1': 'password',
+            'password2': 'password',
+        }
+        form = GoodUserCreationForm(d, instance=user)
+        self.assertTrue(form.is_valid())
+
+        user = LazyUser.objects.convert(form)
+        self.assertFalse(is_lazy_user(user))
+
+    def testConvertNonLazy(self):
+        # Attempting to convert a non-lazy user should raise a TypeError
+        user = User.objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
+        form = GoodUserCreationForm(instance=user)
+        self.assertRaises(NotLazyError, LazyUser.objects.convert, form)
 
 
 
