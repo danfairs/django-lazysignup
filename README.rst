@@ -1,8 +1,8 @@
 Introduction
 ============
 
-``django-lazysignup`` is a package designed to allow users to interact with a 
-site as if they were authenticated users, but without signing up. At any time, 
+``django-lazysignup`` is a package designed to allow users to interact with a
+site as if they were authenticated users, but without signing up. At any time,
 they can convert their temporary user account to a real user account.
 
 ``django-lazysignup`` is beta software. Bug reports, patches and extensions
@@ -12,8 +12,8 @@ maintained for a single point release and a DeprecationWarning issued.
 Requirements
 ============
 
-Tested on Django 1.2.x, though should work on Django 1.0 and later 
-(although you  will need to customise one of the templates.) It requires 
+Tested on Django 1.2.x, though should work on Django 1.0 and later
+(although you  will need to customise one of the templates.) It requires
 ``django.contrib.auth`` to be in the ``INSTALLED_APPS`` list.
 
 Installation
@@ -24,17 +24,17 @@ from PyPI::
 
   pip install django-lazysignup
 
-Once that's done, you need to add ``lazysignup`` to your ``INSTALLED_APPS``. 
-You will also need to add ``lazysignup``'s authentication backend to your 
+Once that's done, you need to add ``lazysignup`` to your ``INSTALLED_APPS``.
+You will also need to add ``lazysignup``'s authentication backend to your
 site's ``AUTHENTICATION_BACKENDS`` setting::
 
   AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'lazysignup.backends.LazySignupBackend',
   )
-  
-If you are using Django prior to 1.2, you should override the 
-``lazysignup/convert.html``  template to remove the ``{% csrf_token %}`` 
+
+If you are using Django prior to 1.2, you should override the
+``lazysignup/convert.html``  template to remove the ``{% csrf_token %}``
 template tag. This may be handled more elegantly in a future release.
 
 Finally, you need to add lazysignup to your URLConf, using something like
@@ -48,18 +48,18 @@ this::
 Usage
 =====
 
-The package works by creating temporary user accounts based on a user's 
+The package works by creating temporary user accounts based on a user's
 session key whenever a flagged view is requested. You can specify which
 views trigger this behaviour using the ``lazysignup.decorators.allow_lazy_user``
 decorator.
 
-When an anonymous user requests such a view, a temporary user account will be 
+When an anonymous user requests such a view, a temporary user account will be
 created for them, and they will be logged in. The user account will have
 an unusable password set, so that it can't be used to log in as a regular
 user. The way to tell a regular use from a temporary user is to call
-the ``is_lazy_user()`` function from ``lazysignup.templatetags.lazysignup_tags``. 
-If this returns ``True``, then the user is temporary. Note that 
-``user.is_anonymous()`` will return ``False``  and ``user.is_authenticated()`` 
+the ``is_lazy_user()`` function from ``lazysignup.templatetags.lazysignup_tags``.
+If this returns ``True``, then the user is temporary. Note that
+``user.is_anonymous()`` will return ``False``  and ``user.is_authenticated()``
 will return ``True``. See below for more information on ``is_lazy_user``.
 
 A view is provided to allow such users to convert their temporary account into
@@ -69,25 +69,25 @@ A Django management command is provided to clear out stale, uncoverted user
 accounts - although this depends on your use of database-backed sessions, and
 assumes that all user accounts with an expired session are safe to delete. This
 may not be the case for all apps, so you may wish to provide your own cleaning
-script. 
+script.
 
 The ``allow_lazy_user`` decorator
 ---------------------------------
 
 Use this decorator to indicate that accessing the view should cause anonymous
-users to have temporary accounts created for them. 
+users to have temporary accounts created for them.
 
 For example::
 
   from django.http import HttpResponse
   from lazysignup.decorators import allow_lazy_user
-  
+
   @allow_lazy_user
   def my_view(request):
     return HttpResponse(request.user.username)
 
 When accessing the above view, a very simple response containing the generated
-username will be displayed. 
+username will be displayed.
 
 The ``is_lazy_user`` template filter
 ------------------------------------
@@ -97,7 +97,7 @@ code) will return True if the user is a generated user. You need to pass it the
 user to test. For example, a site navigation template might look like this::
 
     {% load i18n lazysignup_tags %}
-    
+
     <nav id="account-bar">
       <ul>
         <li><a href="{% url home %}">{% trans "Home" %}</a></li>
@@ -113,11 +113,11 @@ user to test. For example, a site navigation template might look like this::
 This filter is very simple, and can be used directly in view code, or tests. For example::
 
     from lazysignup.templatetags.lazysignup_tags import is_lazy_user
-    
+
     def testIsLazyUserAnonymous(self):
         user = AnonymousUser()
         self.assertEqual(False, is_lazy_user(user))
-    
+
 User agent blacklisting
 -----------------------
 
@@ -126,7 +126,7 @@ user agents. This is simply a fairly crude method for preventing many spurious
 users being created by passing search engines.
 
 The blacklist is specified with the ``USER_AGENT_BLACKLIST`` setting. This
-should be an iterable of regular expression strings. If the user agent string 
+should be an iterable of regular expression strings. If the user agent string
 of a request matches a regex (``search()`` is used, so the match can be anywhere
 in the string) then a user will not be created.
 
@@ -137,15 +137,15 @@ If the list is not specified, then the default is as follows
   - yandex
   - msnbot
   - baiduspider
-  
+
 Specifying your own ``USER_AGENT_BLACKLIST`` will replace this list.
 
 Using the convert view
 ----------------------
 
-Users will be able to visit the ``/convert/`` view. This provides a form with 
+Users will be able to visit the ``/convert/`` view. This provides a form with
 a username, password and password confirmation. As long as they fill in valid
-details, their temporary user account will be converted into a real user 
+details, their temporary user account will be converted into a real user
 account that they can log in with as usual.
 
 You may pass your own form class into the `convert` view in order to customise
@@ -154,15 +154,15 @@ user creation. The code requires expects the following:
   - It expects to be able to create the form passing in the generated ``User``
     object with an ``instance`` kwarg (in general, this is fine when using a
     ModelForm based on the User model)
-  - It expects to be able to call ``save()`` on the form to convert the user 
+  - It expects to be able to call ``save()`` on the form to convert the user
     to a real user
   - It expects to be able to call a ``get_credentials()`` method on the form
     to obtain a set of credentials to authenticate the new user with. The
-    result of this call should be a dictionary suitable for passing to 
+    result of this call should be a dictionary suitable for passing to
     ``django.contrib.auth.authenticate()``. Typically, this would be a dict
     with ``username`` and ``password`` keys - but this may vary if you're using
     a different authentication backend.
-    
+
 The default configuration, using the provided ``UserCreationForm``, should
 be enough for most users, but the customisation point is there if you need
 it.
@@ -176,14 +176,14 @@ recommended that the ``remove_expired_users`` management command is run on
 a regular basis. It runs from the command line::
 
   python manage.py remove_expired_users
-  
+
 In a production environment, this should be run from cron or similar.
 
 This works be removing user accounts from the system whose associated sessions
 are no longer in the session table. ``user.delete()`` is called for each user,
 so related data will be removed as well.
 
-Note of course that these deletes will cascade, so if you need to keep data 
+Note of course that these deletes will cascade, so if you need to keep data
 associated with such users, you'll need to write your own cleanup job. It also
 expects that you're using database backed sessions. If that's not the case, then
 you'll again need to write your own cleanup.
@@ -197,6 +197,6 @@ features with tests have a greater chance of being merged. To run the tests,
 do::
 
   python manage.py test --settings=lazysignup.test_settings lazysignup
-  
+
 
 Note that the tests require the ``mock`` package.

@@ -5,7 +5,7 @@ from lazysignup.urls import urlpatterns
 from lazysignup.tests import GoodUserCreationForm
 
 # URL test patterns for lazysignup. Use this file to ensure a consistent
-# set of URL patterns are used when running unit tests. 
+# set of URL patterns are used when running unit tests.
 
 urlpatterns += patterns('lazysignup.tests',
     url(r'^nolazy/$', 'view', name='test_view'),

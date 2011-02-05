@@ -23,8 +23,8 @@ def allow_lazy_user(func):
                 if user_agent.search(request_user_agent):
                     ignore = True
                     break
-        
-            # If there's already a key in the session for a valid user, then we don't 
+
+            # If there's already a key in the session for a valid user, then we don't
             # need to do anything. If the user isn't valid, then get_user will return
             # an anonymous user
             if get_user(request).is_anonymous() and not ignore:
@@ -39,5 +39,5 @@ def allow_lazy_user(func):
                 request.session[SESSION_KEY] = user.id
                 login(request, user)
         return func(request, *args, **kwargs)
-        
+
     return wraps(func)(wrapped)
