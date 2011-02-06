@@ -37,6 +37,10 @@ If you are using Django prior to 1.2, you should override the
 ``lazysignup/convert.html``  template to remove the ``{% csrf_token %}``
 template tag. This may be handled more elegantly in a future release.
 
+Next, you need to ensure that the tables that ``lazysignup`` uses are created.
+You should either run ``python manage.py syncdb``, or use the South support
+and run ``python manage.py migrate lazysignup``.
+
 Finally, you need to add lazysignup to your URLConf, using something like
 this::
 
@@ -92,9 +96,10 @@ username will be displayed.
 The ``is_lazy_user`` template filter
 ------------------------------------
 
-This template filter (which can also be imported directly and used in your view
-code) will return True if the user is a generated user. You need to pass it the
-user to test. For example, a site navigation template might look like this::
+This template filter (which can also be imported from ``lazysignup.utils``
+and used in your own code) will return True if the user is a generated user.
+You need to pass it the user to test. For example, a site navigation
+template might look like this::
 
     {% load i18n lazysignup_tags %}
 
@@ -112,11 +117,14 @@ user to test. For example, a site navigation template might look like this::
 
 This filter is very simple, and can be used directly in view code, or tests. For example::
 
-    from lazysignup.templatetags.lazysignup_tags import is_lazy_user
+    from lazysignup.utils import is_lazy_user
 
     def testIsLazyUserAnonymous(self):
         user = AnonymousUser()
         self.assertEqual(False, is_lazy_user(user))
+
+Note that as of version 0.6.0, the user tested no longer needs to have been
+authenticated by the ``LazySignupBackend`` for lazy user detection to work.
 
 User agent blacklisting
 -----------------------
