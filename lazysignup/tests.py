@@ -376,9 +376,6 @@ class LazyTestCase(TestCase):
         self.request.session[SESSION_KEY] = 1000
         self.request.session[BACKEND_SESSION_KEY] = 'lazysignup.backends.LazySignupBackend'
         lazy_view(self.request)
-        backend = LazySignupBackend()
-        pk = User.objects.all()[0].pk
-        self.assertEqual('lazysignup.backends.LazySignupBackend', backend.get_user(pk).backend)
 
     def testConvertGood(self):
         # Check that the convert() method on the lazy user manager
