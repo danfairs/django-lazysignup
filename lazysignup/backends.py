@@ -15,5 +15,6 @@ class LazySignupBackend(ModelBackend):
         # not just when authenticate() has been called. This will be
         # used by the is_lazy_user filter.
         user = super(LazySignupBackend, self).get_user(user_id)
-        user.backend = 'lazysignup.backends.LazySignupBackend'
+        if user:
+            user.backend = 'lazysignup.backends.LazySignupBackend'
         return user
