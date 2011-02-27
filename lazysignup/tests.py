@@ -4,7 +4,7 @@ from functools import wraps
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest
-from django.contrib.auth import SESSION_KEY
+from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
@@ -54,7 +54,7 @@ def view(request):
 def lazy_view(request):
     from django.http import HttpResponse
     r = HttpResponse()
-    if request.user.is_anonymous() or  request.user.has_usable_password():
+    if request.user.is_anonymous() or request.user.has_usable_password():
         r.status_code = 500
     return r
 lazy_view = allow_lazy_user(lazy_view)
@@ -181,7 +181,7 @@ class LazyTestCase(TestCase):
         # We should find that the auth backend used is no longer the
         # Lazy backend, as the conversion should have logged the new
         # user in.
-        self.assertNotEqual('lazysignup.backends.LazySignupBackend', self.client.session['_auth_user_backend'])
+        self.assertNotEqual('lazysignup.backends.LazySignupBackend', self.client.session[BACKEND_SESSION_KEY])
 
     def testConvertNonAjax(self):
         # If it's a regular web browser, we should get a 301.
@@ -367,6 +367,14 @@ class LazyTestCase(TestCase):
     def testBackendGetUserAnnotates(self):
         # Check that the lazysignup backend annotates the user object
         # with the backend, mirroring what Django's does
+        lazy_view(self.request)
+        backend = LazySignupBackend()
+        pk = User.objects.all()[0].pk
+        self.assertEqual('lazysignup.backends.LazySignupBackend', backend.get_user(pk).backend)
+
+    def testBadSessionUserId(self):
+        self.request.session[SESSION_KEY] = 1000
+        self.request.session[BACKEND_SESSION_KEY] = 'lazysignup.backends.LazySignupBackend'
         lazy_view(self.request)
         backend = LazySignupBackend()
         pk = User.objects.all()[0].pk
