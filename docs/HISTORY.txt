@@ -2,6 +2,16 @@
 Changelog
 =========
 
+0.6.1
+-----
+
+This is a bugfix release. Issues fixed:
+
+* https://github.com/danfairs/django-lazysignup/issues#issue/2 - Invalid user
+  IDs in the session could cause an AttributeError from the auth backend.
+
+Thanks to Alex Ehlke for the report and patch.
+
 0.6.0
 -----
 
