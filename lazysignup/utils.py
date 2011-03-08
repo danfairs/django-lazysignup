@@ -1,5 +1,7 @@
 import hashlib
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import get_model
 
 def username_from_session(session_key, username_length=None):
     if not username_length:
@@ -21,3 +23,18 @@ def is_lazy_user(user):
     # Otherwise, we have to fall back to checking the database.
     from lazysignup.models import LazyUser
     return bool(LazyUser.objects.filter(user=user).count() > 0)
+
+def get_user_class():
+    """ Try loading an alternate user class according to an optional
+    setting (USER_MODEL).
+    If one isn't provided, or is misconfigured, return the default one.
+    """
+    try:
+        user_class = get_model(*settings.USER_MODEL.split('.', 2))
+    except AttributeError:
+        user_class = None
+
+    if not user_class:
+        user_class = User
+
+    return user_class

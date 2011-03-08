@@ -6,7 +6,7 @@ from django.db import models
 from lazysignup.decorators import USER_AGENT_BLACKLIST
 from lazysignup.forms import UserCreationForm
 from lazysignup.exceptions import NotLazyError
-from lazysignup.utils import is_lazy_user
+from lazysignup.utils import is_lazy_user, get_user_class
 
 DEFAULT_BLACKLIST = (
     'slurp',
@@ -25,7 +25,7 @@ class LazyUserManager(models.Manager):
     def create_lazy_user(self, username):
         """ Create a lazy user.
         """
-        user = User.objects.create_user(username, '')
+        user = get_user_class().objects.create_user(username, '')
         self.create(user=user)
         return user
 
