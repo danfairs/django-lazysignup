@@ -4,7 +4,6 @@ from django.contrib.auth import SESSION_KEY
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user
 from django.contrib.auth import login
-from django.contrib.auth.models import User
 
 from lazysignup.utils import username_from_session
 
