@@ -2,6 +2,17 @@
 Changelog
 =========
 
+0.6.2
+-----
+
+This is a bugfix release. Issues fixed:
+
+* The LazySignupBackend no longer relies on a specific User class to
+  authenticate a user. It now uses the fact that there is a relationship
+  between the LazyUser and the main site User class. This fixes the bug
+  where authenticate() was looking directly for UNUSABLE_PASSWORD, and also
+  paves the way for custom user classes.
+
 0.6.1
 -----
 
