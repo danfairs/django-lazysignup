@@ -1,14 +1,16 @@
 from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.models import User
+from lazysignup.models import LazyUser
 
 class LazySignupBackend(ModelBackend):
 
     def authenticate(self, username=None):
-        users = [u for u in User.objects.filter(username=username)
-                 if not u.has_usable_password()]
-        if len(users) != 1:
+        lazy_users = LazyUser.objects.filter(
+            user__username=username
+        ).select_related('user')
+        try:
+            return lazy_users[0].user
+        except IndexError:
             return None
-        return users[0]
 
     def get_user(self, user_id):
         # Annotate the user with our backend so it's always available,
@@ -18,3 +20,4 @@ class LazySignupBackend(ModelBackend):
         if user:
             user.backend = 'lazysignup.backends.LazySignupBackend'
         return user
+
