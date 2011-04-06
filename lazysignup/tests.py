@@ -3,6 +3,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.db import models
 from django.http import HttpRequest
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
 from django.contrib.auth import authenticate
@@ -10,6 +11,7 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import User
+from django.contrib.auth.models import UserManager
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sessions.models import Session
 from django.test import TestCase
@@ -76,6 +78,11 @@ def no_lazysignup(func):
                 settings.LAZYSIGNUP_ENABLE = old
         return result
     return wraps(func)(wrapped)
+
+
+class CustomUser(User):
+    objects = UserManager()
+    my_custom_field = models.CharField(max_length=50, blank=True, null=True)
 
 
 class LazyTestCase(TestCase):
@@ -397,6 +404,11 @@ class LazyTestCase(TestCase):
         user = User.objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
         form = GoodUserCreationForm(instance=user)
         self.assertRaises(NotLazyError, LazyUser.objects.convert, form)
+        
+    def testUserField(self):
+        # We should find that our LAZSIGNUP_CUSTOM_USER setting has been
+        # respected.
+        self.assertEqual(CustomUser, LazyUser.get_user_class())
 
 
 

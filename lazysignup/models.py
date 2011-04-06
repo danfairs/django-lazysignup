@@ -25,7 +25,8 @@ class LazyUserManager(models.Manager):
     def create_lazy_user(self, username):
         """ Create a lazy user.
         """
-        user = User.objects.create_user(username, '')
+        user_class = LazyUser.get_user_class()
+        user = user_class.objects.create_user(username, '')
         self.create(user=user)
         return user
 
@@ -50,5 +51,11 @@ class LazyUserManager(models.Manager):
 
 
 class LazyUser(models.Model):
-    user = models.ForeignKey('auth.User', unique=True)
+    user = models.ForeignKey(
+        getattr(settings, 'LAZYSIGNUP_USER_MODEL', 'auth.User'),
+        unique=True)
     objects = LazyUserManager()
+
+    @classmethod
+    def get_user_class(cls):
+        return cls._meta.get_field('user').rel.to

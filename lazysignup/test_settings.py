@@ -35,3 +35,5 @@ LAZYSIGNUP_USER_AGENT_BLACKLIST = [
 # This merely needs to be present - as long as your test case specifies a
 # urls attribute, it does not need to be populated.
 ROOT_URLCONF = ''
+
+LAZYSIGNUP_USER_MODEL = 'lazysignup.CustomUser'
