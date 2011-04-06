@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '0.6.2'
+version = '0.7.0'
 
 setup(name='django-lazysignup',
       version=version,
@@ -28,7 +28,6 @@ setup(name='django-lazysignup',
       install_requires=[
           'setuptools',
           'Django',
-          # -*- Extra requirements: -*-
       ],
       entry_points="""
       # -*- Entry points: -*-

@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.7.0
+-----
+
+This is a feature release. Custom user classes are now supported via the
+``LAZYSIGNUP_USER_MODEL`` setting. This is a backwards-compatible change.
+
 0.6.2
 -----
 
