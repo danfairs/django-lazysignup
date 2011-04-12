@@ -4,20 +4,22 @@ from lazysignup.models import LazyUser
 class LazySignupBackend(ModelBackend):
 
     def authenticate(self, username=None):
-        lazy_users = LazyUser.objects.filter(
-            user__username=username
-        ).select_related('user')
+        user_class = LazyUser.get_user_class()
         try:
-            return lazy_users[0].user
-        except IndexError:
+            return user_class.objects.get(username=username)
+        except user_class.DoesNotExist:
             return None
 
     def get_user(self, user_id):
         # Annotate the user with our backend so it's always available,
         # not just when authenticate() has been called. This will be
         # used by the is_lazy_user filter.
-        user = super(LazySignupBackend, self).get_user(user_id)
-        if user:
+        user_class = LazyUser.get_user_class()
+        try:
+            user = user_class.objects.get(pk=user_id)
+        except user_class.DoesNotExist:
+            user = None
+        else:
             user.backend = 'lazysignup.backends.LazySignupBackend'
         return user
 

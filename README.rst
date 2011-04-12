@@ -200,6 +200,10 @@ use this manager directly. For example::
 
         notes = models.TextField(blank=True, null=True)
 
+``lazysignup`` also expects that it can fetch instances of your custom user
+class using a ``get`` method on the object's manager, and that looking them
+up by primary key and by ``username`` will work. See ``lazysignup.backends``
+for more detail.
 
 Maintenance
 -----------
