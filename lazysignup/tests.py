@@ -2,6 +2,8 @@ import datetime
 from functools import wraps
 
 from django.conf import settings
+from django.contrib.auth import authenticate, login
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.http import HttpRequest
@@ -404,11 +406,19 @@ class LazyTestCase(TestCase):
         user = User.objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
         form = GoodUserCreationForm(instance=user)
         self.assertRaises(NotLazyError, LazyUser.objects.convert, form)
-        
+
     def testUserField(self):
         # We should find that our LAZSIGNUP_CUSTOM_USER setting has been
         # respected.
         self.assertEqual(CustomUser, LazyUser.get_user_class())
 
+    def testAuthenticatedUserClass(self):
+        # We should find that the class of request.user is that of
+        # LAZSIGNUP_CUSTOM_USER
+        request = HttpRequest()
+        request.user = AnonymousUser()
+        SessionMiddleware().process_request(request)
+        lazy_view(request)
+        self.assertEqual(CustomUser, type(request.user))
 
 
