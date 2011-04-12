@@ -8,6 +8,8 @@ Changelog
 This is a feature release. Custom user classes are now supported via the
 ``LAZYSIGNUP_USER_MODEL`` setting. This is a backwards-compatible change.
 
+Thanks to Luke Zapart for the idea and initial implementation.
+
 0.6.2
 -----
 
