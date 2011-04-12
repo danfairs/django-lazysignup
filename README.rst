@@ -220,7 +220,9 @@ so related data will be removed as well.
 Note of course that these deletes will cascade, so if you need to keep data
 associated with such users, you'll need to write your own cleanup job. It also
 expects that you're using database backed sessions. If that's not the case, then
-you'll again need to write your own cleanup.
+you'll again need to write your own cleanup. Finally, if you're using a custom
+user class where the user isn't a subclass of Django's own user model, you'll
+again need your own cleanup script.
 
 Helping Out
 -----------
