@@ -22,6 +22,9 @@ setup(name='django-lazysignup',
       url='http://github.com/danfairs/django-lazysignup',
       license='BSD',
       packages=find_packages(exclude=['ez_setup']),
+      package_data = {
+        'lazysignup': ['templates/lazysignup/*html']
+        },
       namespace_packages=[],
       include_package_data=True,
       zip_safe=False,
