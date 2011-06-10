@@ -1,3 +1,4 @@
+import hashlib
 from functools import wraps
 
 from django.conf import settings
@@ -6,6 +7,7 @@ from django.db import models
 from django.http import HttpRequest
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
 from django.contrib.auth import authenticate
+from django.contrib.auth import get_user
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import AnonymousUser
@@ -118,22 +120,17 @@ class LazyTestCase(TestCase):
         mock_resolve.return_value = (f, None, None)
 
         f(self.request)
-        self.assertEqual(
-            username_from_session(self.request.session.session_key),
-            self.request.user.username)
+        self.failIf(self.request.user.username is None)
         self.assertEqual(False, self.request.user.has_usable_password())
 
     @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
     def test_create_lazy_user(self, mock_resolve):
         # If there isn't a setup session, then this middleware should create a
-        # user with the same name as the session key, and an unusable
-        # password.
+        # user with a random username and an unusable password.
         f = allow_lazy_user(lambda request: 1)
         mock_resolve.return_value = (f, None, None)
         f(self.request)
-        self.assertEqual(
-            username_from_session(self.request.session.session_key),
-            self.request.user.username)
+        self.failIf(self.request.user.username is None)
         self.assertEqual(False, self.request.user.has_usable_password())
 
     @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
@@ -167,7 +164,7 @@ class LazyTestCase(TestCase):
         # password and the Django user model. Make sure that it actually
         # uses the LazyUser mechanism.
         u = User.objects.create_user('dummy2', '')
-        LazyUser.objects.create_lazy_user(username_from_session('dummy'))
+        LazyUser.objects.create_lazy_user()
         c = remove_expired_users.Command()
         c.handle()
         users = User.objects.all()
@@ -379,7 +376,7 @@ class LazyTestCase(TestCase):
     def test_lazy_user_not_logged_in(self):
         # Check that the is_lazy_user works for users who were created
         # lazily but are not the current logged-in user
-        user = LazyUser.objects.create_lazy_user('foo')
+        user, username = LazyUser.objects.create_lazy_user()
         self.assertTrue(is_lazy_user(user))
 
     def test_anonymous_not_lazy(self):
@@ -404,7 +401,7 @@ class LazyTestCase(TestCase):
     def test_convert_good(self):
         # Check that the convert() method on the lazy user manager
         # correctly converts the lazy user
-        user = LazyUser.objects.create_lazy_user('foo')
+        user, username = LazyUser.objects.create_lazy_user()
         d = {
             'username': 'test',
             'password1': 'password',
@@ -444,3 +441,19 @@ class LazyTestCase(TestCase):
         user_class = LazyUser.get_user_class()
         pk = user_class.objects.all()[0].pk
         self.assertEqual(user_class, type(backend.get_user(pk)))
+
+    def test_session_name_conflict(self):
+        # Test for issue #6. If a user object exists with the same name as
+        # the sha-1 hash of the session id (well, the first
+        # username.max_length characters thereof) then we should not see an
+        # error when the user is created. This was actually fixed by changing
+        # the mechanism to associate a lazy user with a session.
+
+        # Calling get_user triggers a session key cycle the first time. Do it
+        # now, so we can grab the final session key.
+        get_user(self.request)
+        key = self.request.session.session_key
+        username = hashlib.sha1(key).hexdigest()[:30]
+        User.objects.create_user(username, '')
+        r = lazy_view(self.request)
+        self.assertEqual(200, r.status_code)

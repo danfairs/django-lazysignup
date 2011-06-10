@@ -2,10 +2,12 @@
 Changelog
 =========
 
-0.7.1
+0.8.0
 -----
 
-This is a bugfix release.
+This is a bugfix and refactor release. The internal API has changed to no
+longer depend on session keys for username generation. This should be
+backwards-compatible as long as you are using the documented API.
 
 * PEP8 cleanups
 * Tweak setup.py to make sure templates are installed (thanks Kurt Grandis)

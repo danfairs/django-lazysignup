@@ -5,8 +5,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import get_user
 from django.contrib.auth import login
 
-from lazysignup.utils import username_from_session
-
 ALLOW_LAZY_REGISTRY = {}
 USER_AGENT_BLACKLIST = []
 
@@ -30,8 +28,7 @@ def allow_lazy_user(func):
             if get_user(request).is_anonymous() and not ignore:
                 # If not, then we have to create a user, and log them in.
                 from lazysignup.models import LazyUser
-                username = username_from_session(request.session.session_key)
-                user = LazyUser.objects.create_lazy_user(username)
+                user, username = LazyUser.objects.create_lazy_user()
                 request.user = None
                 user = authenticate(username=username)
                 assert user, ("Lazy user creation and authentication "
