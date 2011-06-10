@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.7.1
+-----
+
+This is a bugfix release.
+
+* PEP8 cleanups
+
 0.7.0
 -----
 
