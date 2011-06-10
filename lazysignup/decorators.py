@@ -10,6 +10,7 @@ from lazysignup.utils import username_from_session
 ALLOW_LAZY_REGISTRY = {}
 USER_AGENT_BLACKLIST = []
 
+
 def allow_lazy_user(func):
     def wrapped(request, *args, **kwargs):
         assert hasattr(request, 'session'), ("You need to have the session "
@@ -23,9 +24,9 @@ def allow_lazy_user(func):
                     ignore = True
                     break
 
-            # If there's already a key in the session for a valid user, then we don't
-            # need to do anything. If the user isn't valid, then get_user will return
-            # an anonymous user
+            # If there's already a key in the session for a valid user, then
+            # we don't need to do anything. If the user isn't valid, then
+            # get_user will return an anonymous user
             if get_user(request).is_anonymous() and not ignore:
                 # If not, then we have to create a user, and log them in.
                 from lazysignup.models import LazyUser

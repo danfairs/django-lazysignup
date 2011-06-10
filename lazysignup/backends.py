@@ -1,6 +1,7 @@
 from django.contrib.auth.backends import ModelBackend
 from lazysignup.models import LazyUser
 
+
 class LazySignupBackend(ModelBackend):
 
     def authenticate(self, username=None):
@@ -22,4 +23,3 @@ class LazySignupBackend(ModelBackend):
         else:
             user.backend = 'lazysignup.backends.LazySignupBackend'
         return user
-
