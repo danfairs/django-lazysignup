@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 from functools import wraps
 
@@ -24,7 +25,7 @@ from lazysignup.decorators import allow_lazy_user
 from lazysignup.exceptions import NotLazyError
 from lazysignup.management.commands import remove_expired_users
 from lazysignup.models import LazyUser
-from lazysignup.utils import is_lazy_user, username_from_session
+from lazysignup.utils import is_lazy_user
 
 _missing = object()
 
@@ -87,7 +88,7 @@ def no_lazysignup(func):
 class CustomUser(User):
     objects = UserManager()
     my_custom_field = models.CharField(max_length=50, blank=True, null=True)
-    custom_username = models.CharField(max_length=35, unique=True)
+    custom_username = models.CharField(max_length=35)
 
 
 class LazyTestCase(TestCase):
@@ -163,13 +164,29 @@ class LazyTestCase(TestCase):
         # remove_expired_users used to be hardcoded to look for an unusable
         # password and the Django user model. Make sure that it actually
         # uses the LazyUser mechanism.
-        u = User.objects.create_user('dummy2', '')
-        LazyUser.objects.create_lazy_user()
+        User.objects.create_user('dummy2', '')
+        user, _ = LazyUser.objects.create_lazy_user()
+        user.last_login = datetime.datetime(1972, 1, 1)
+        user.save()
         c = remove_expired_users.Command()
         c.handle()
         users = User.objects.all()
         self.assertEqual(1, len(users))
-        self.assertEqual(u, users[0])
+        self.assertEqual('dummy2', users[0].username)
+
+    def test_remove_expired_users_session_cookie_age(self):
+        # The remove_expired_users should look at SESSION_COOKIE_AGE to figure
+        # out whether to delete users. It will delete users who have not
+        # logged in since datetime.datetime.now - SESSION_COOKIE_AGE.
+        user1, _ = LazyUser.objects.create_lazy_user()
+        user2, _ = LazyUser.objects.create_lazy_user()
+        user1.last_login = datetime.datetime(1972, 1, 1)
+        user1.save()
+        c = remove_expired_users.Command()
+        c.handle()
+        users = User.objects.all()
+        self.assertEqual(1, len(users))
+        self.assertEqual(user2.username, users[0].username)
 
     def test_convert_ajax(self):
         # Calling convert with an AJAX request should result in a 200
@@ -333,18 +350,9 @@ class LazyTestCase(TestCase):
         # doing so isn't a security problem in itself, any client software
         # that blindly displays the logged-in user's username risks showing
         # most of the session key to the world.
-        fake_session_key = 'a' * 32
-        username = username_from_session(fake_session_key)
-        self.failIf(fake_session_key.startswith(username))
-
-    def test_username_from_session_uses_custom_user(self):
-        # Check that username_from_session uses the custom user class.
-        assert CustomUser._meta.get_field('custom_username').max_length != \
-            User._meta.get_field('username').max_length
-        fake_session_key = 'a' * 32
-        username = username_from_session(fake_session_key,
-            username_field='custom_username')
-        self.assertEqual(35, len(username))
+        session_key = self.request.session.session_key
+        user, username = LazyUser.objects.create_lazy_user()
+        self.failIf(session_key.startswith(username))
 
     def test_decorator_order(self):
         # It used to be the case that allow_lazy_user had to be first in the

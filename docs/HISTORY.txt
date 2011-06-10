@@ -2,17 +2,34 @@
 Changelog
 =========
 
-0.8.0
------
+0.8.0b1
+-------
 
-This is a bugfix and refactor release. The internal API has changed to no
+This is a bugfix and feature release. The internal API has changed to no
 longer depend on session keys for username generation. This should be
 backwards-compatible as long as you are using the documented API.
 
+The following bugs have been fixed:
+
 * PEP8 cleanups
 * Tweak setup.py to make sure templates are installed (thanks Kurt Grandis)
-* Fix a problem in remove_expired_users, which was still using the old
-  UNUSABLE_PASSWORD approach.
+
+The following features have been added:
+
+* Removed the hard dependency on session keys to generate usernames, as it was
+  unnecessary.
+* remove_expired_users should no longer depend on using the database session
+  backend - it will instead use SESSION_COOKIE_AGE to find lazy users
+  who have not logged in recently and whose sessions will therefore have
+  expired.
+
+You should still not use remove_expired_users without reviewing the code;
+in particular, you may wish to subclass the command and override
+`to_delete()`.
+
+These changes are somewhat experimental, so this is a beta release - it is
+*not* recommended that you run this in production. Testing and feedback is
+welcome.
 
 0.7.0
 -----

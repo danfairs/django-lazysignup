@@ -1,17 +1,3 @@
-import hashlib
-
-
-def username_from_session(session_key, username_length=None,
-    username_field='username'):
-    """ Return the username based on the provided session key. """
-    from lazysignup.models import LazyUser
-    user_class = LazyUser.get_user_class()
-    if not username_length:
-        username_length = user_class._meta.get_field(
-            username_field).max_length
-    return hashlib.sha1(session_key).hexdigest()[:username_length]
-
-
 def is_lazy_user(user):
     """ Return True if the passed user is a lazy user. """
     # Anonymous users are not lazy.
