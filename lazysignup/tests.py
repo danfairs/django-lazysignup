@@ -436,7 +436,7 @@ class LazyTestCase(TestCase):
         lazy_view(request)
         self.assertEqual(CustomUser, type(request.user))
 
-    def testBackendGetUserCustomClass(self):
+    def test_backend_get_custom_user_class(self):
         # The get_user method on the backend should also return instances of
         # the custom user class.
         lazy_view(self.request)
