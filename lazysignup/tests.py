@@ -1,4 +1,3 @@
-import datetime
 from functools import wraps
 
 from django.conf import settings
@@ -13,7 +12,6 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import User
 from django.contrib.auth.models import UserManager
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.contrib.sessions.models import Session
 from django.test import TestCase
 from django.views.decorators.http import require_POST
 
@@ -87,6 +85,7 @@ def no_lazysignup(func):
 class CustomUser(User):
     objects = UserManager()
     my_custom_field = models.CharField(max_length=50, blank=True, null=True)
+    custom_username = models.CharField(max_length=35, unique=True)
 
 
 class LazyTestCase(TestCase):
@@ -163,23 +162,17 @@ class LazyTestCase(TestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(User.objects.all()))
 
-    def test_remove_expired_users(self):
-        # Users wihout usable passwords who don't have a current session
-        # record should be removed.
-        u1 = User.objects.create_user(username_from_session('dummy'), '')
-        User.objects.create_user('dummy2', '')
-        s = Session(
-            session_key='dummy',
-            session_data='',
-            expire_date=datetime.datetime.now() + datetime.timedelta(1))
-        s.save()
-
+    def test_remove_expired_users_uses_lazy_model(self):
+        # remove_expired_users used to be hardcoded to look for an unusable
+        # password and the Django user model. Make sure that it actually
+        # uses the LazyUser mechanism.
+        u = User.objects.create_user('dummy2', '')
+        LazyUser.objects.create_lazy_user(username_from_session('dummy'))
         c = remove_expired_users.Command()
         c.handle()
-
         users = User.objects.all()
         self.assertEqual(1, len(users))
-        self.assertEqual(u1, users[0])
+        self.assertEqual(u, users[0])
 
     def test_convert_ajax(self):
         # Calling convert with an AJAX request should result in a 200

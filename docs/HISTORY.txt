@@ -8,6 +8,9 @@ Changelog
 This is a bugfix release.
 
 * PEP8 cleanups
+* Tweak setup.py to make sure templates are installed (thanks Kurt Grandis)
+* Fix a problem in remove_expired_users, which was still using the old
+  UNUSABLE_PASSWORD approach.
 
 0.7.0
 -----

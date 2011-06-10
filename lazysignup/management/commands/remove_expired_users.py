@@ -1,30 +1,29 @@
 from django.core.management.base import NoArgsCommand
-
-from django.contrib.auth.models import UNUSABLE_PASSWORD
-from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 
+from lazysignup.models import LazyUser
 from lazysignup.utils import username_from_session
 
 
 class Command(NoArgsCommand):
     help = u"""Remove all users whose sessions have expired and who haven't
-               set a password"""
+               set a password. This assumes you are using database sessions"""
 
     def handle_noargs(self, **options):
-        usernames = [username_from_session(sk) for sk in
-            Session.objects.all().values_list('session_key', flat=True)]
+        usernames = self.get_valid_usersnames()
 
-        # Find all the users who have an unusable password, whose usernames
-        # aren't in the list of valid sessions:
-        session_users = User.objects.filter(
-            password=UNUSABLE_PASSWORD).exclude(
-            username__in=usernames)
+        # Find all LazyUser objects who no longer have a valid session
+        to_delete = LazyUser.objects.exclude(
+            user__username__in=usernames).select_related('user')
 
         # Delete each of these users. We don't use the queryset delete()
         # because we want cascades to work.
-        for user in session_users:
-            user.delete()
+        for lazy_user in to_delete:
+            lazy_user.user.delete()
 
     def get_username(self, session_key, username_length=None):
         return username_from_session(session_key, username_length)
+
+    def get_valid_usersnames(self):
+        return [username_from_session(sk) for sk in
+            Session.objects.all().values_list('session_key', flat=True)]
