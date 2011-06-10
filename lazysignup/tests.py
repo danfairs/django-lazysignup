@@ -340,6 +340,15 @@ class LazyTestCase(TestCase):
         username = username_from_session(fake_session_key)
         self.failIf(fake_session_key.startswith(username))
 
+    def test_username_from_session_uses_custom_user(self):
+        # Check that username_from_session uses the custom user class.
+        assert CustomUser._meta.get_field('custom_username').max_length != \
+            User._meta.get_field('username').max_length
+        fake_session_key = 'a' * 32
+        username = username_from_session(fake_session_key,
+            username_field='custom_username')
+        self.assertEqual(35, len(username))
+
     def test_decorator_order(self):
         # It used to be the case that allow_lazy_user had to be first in the
         # decorator list. This is no longer the case.
