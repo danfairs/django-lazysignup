@@ -4,10 +4,27 @@ from django.contrib.auth import SESSION_KEY
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user
 from django.contrib.auth import login
+from django.http import HttpResponseRedirect
+from django.utils.http import urlquote
 
 ALLOW_LAZY_REGISTRY = {}
 USER_AGENT_BLACKLIST = []
 
+def require_registered_user(func):
+    def wrapped(request, *args, **kwargs):
+        from lazysignup.utils import is_lazy_user
+
+        try:
+            user = get_user(request)
+            if is_lazy_user(user) or not user.is_authenticated():
+                raise Exception("Not registered")
+        except:
+            return HttpResponseRedirect("{url}?next={this_url}".format(
+                    url = settings.LOGIN_URL,
+                    this_url = urlquote(request.get_full_path())
+                ))
+        return func(request, *args, **kwargs)
+    return wraps(func)(wrapped)
 
 def allow_lazy_user(func):
     def wrapped(request, *args, **kwargs):
