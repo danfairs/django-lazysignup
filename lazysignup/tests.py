@@ -96,6 +96,9 @@ class LazyTestCase(TestCase):
     urls = 'lazysignup.test_urls'
 
     def setUp(self):
+        if not getattr(settings, 'LAZYSIGNUP_TEST_SETTINGS', False):
+            self.skipTest('Skipping tests because not using test settings')
+
         self.request = HttpRequest()
         SessionMiddleware().process_request(self.request)
 
