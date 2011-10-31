@@ -37,3 +37,6 @@ LAZYSIGNUP_USER_AGENT_BLACKLIST = [
 ROOT_URLCONF = ''
 
 LAZYSIGNUP_USER_MODEL = 'lazysignup.CustomUser'
+
+# Internal setting to discover it test settings are used
+LAZYSIGNUP_TEST_SETTINGS = True
