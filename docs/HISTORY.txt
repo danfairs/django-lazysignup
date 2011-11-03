@@ -9,6 +9,9 @@ This release introduces the following backwards-incompatible changes:
 
 * A test project was added to make running the tests a little easier. The old
   way of running the tests has been removed.
+* The `urls.py` no longer hardcodes `convert` as the URL prefix (thanks
+  to mitar)
+
 0.8.0b1
 -------
 

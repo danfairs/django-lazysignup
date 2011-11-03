@@ -93,8 +93,6 @@ class CustomUser(User):
 
 class LazyTestCase(TestCase):
 
-    urls = 'lazysignup.test_urls'
-
     def setUp(self):
         self.request = HttpRequest()
         SessionMiddleware().process_request(self.request)

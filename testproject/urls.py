@@ -1,17 +1,23 @@
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls.defaults import patterns, url, include
+from django.contrib.auth.forms import UserCreationForm
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from lazysignup.tests import GoodUserCreationForm
+
+# URL test patterns for lazysignup. Use this file to ensure a consistent
+# set of URL patterns are used when running unit tests.
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'testproject.views.home', name='home'),
-    # url(r'^testproject/', include('testproject.foo.urls')),
+    (r'^convert/', include('lazysignup.urls')),
+)
 
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+urlpatterns += patterns('lazysignup.tests',
+    url(r'^nolazy/$', 'view', name='test_view'),
+    url(r'^lazy/$', 'lazy_view', name='test_lazy_view'),
+)
 
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+urlpatterns += patterns('lazysignup.views',
+    url(r'^bad-custom-convert/$', 'convert', {
+        'form_class': UserCreationForm}, name='test_bad_convert'),
+    url(r'^good-custom-convert/$', 'convert', {
+        'form_class': GoodUserCreationForm}, name='test_good_convert'),
 )
