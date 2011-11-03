@@ -235,7 +235,7 @@ on GitHub, and when you're done with your changes, let me know. Fixes and
 features with tests have a greater chance of being merged. To run the tests,
 do::
 
-  python manage.py test --settings=lazysignup.test_settings lazysignup
-
+  cd /path/to/src/lazysignup
+  python manage.py test lazysignup
 
 Note that the tests require the ``mock`` package.
