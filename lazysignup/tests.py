@@ -293,6 +293,14 @@ class LazyTestCase(TestCase):
         response = self.client.get('/convert/')
         self.assertEqual(200, response.status_code)
 
+    def test_get_convert_via_ajax(self):
+        # Load convert.html via AJAX
+        print "convert via ajax"
+        self.client.get('/lazy/')
+        response = self.client.get(reverse('lazysignup_convert'),
+                                   HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(200, response.status_code)
+
     @no_lazysignup
     def test_convert_anon(self):
         # If the Convert view gets an anonymous user, it should redirect
