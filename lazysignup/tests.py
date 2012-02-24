@@ -295,7 +295,6 @@ class LazyTestCase(TestCase):
 
     def test_get_convert_via_ajax(self):
         # Load convert.html via AJAX
-        print "convert via ajax"
         self.client.get('/lazy/')
         response = self.client.get(reverse('lazysignup_convert'),
                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
