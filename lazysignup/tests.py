@@ -206,6 +206,12 @@ class LazyTestCase(TestCase):
         self.assertNotEqual('lazysignup.backends.LazySignupBackend',
             self.client.session[BACKEND_SESSION_KEY])
 
+    def test_convert_custom_template(self):
+        # Check a custom template is used, if specified.
+        response = self.client.get('/custom_convert/')
+        self.assertEqual(['lazysignup/done.html'],
+            [t.name for t in response.templates])
+
     def test_convert_non_ajax(self):
         # If it's a regular web browser, we should get a 301.
         self.client.get('/lazy/')

@@ -8,6 +8,9 @@ from lazysignup.tests import GoodUserCreationForm
 
 urlpatterns = patterns('',
     (r'^convert/', include('lazysignup.urls')),
+    (r'^custom_convert/', 'lazysignup.views.convert', {
+        'template_name': 'lazysignup/done.html'
+        }),
 )
 
 urlpatterns += patterns('lazysignup.tests',

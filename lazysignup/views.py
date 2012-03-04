@@ -18,7 +18,8 @@ from lazysignup.models import LazyUser
 @allow_lazy_user
 def convert(request, form_class=UserCreationForm,
             redirect_field_name='redirect_to',
-            anonymous_redirect=settings.LOGIN_URL):
+            anonymous_redirect=settings.LOGIN_URL,
+            template_name='lazysignup/convert.html'):
     """ Convert a temporary user to a real one. Reject users who don't
     appear to be temporary users (ie. they have a usable password)
     """
@@ -57,13 +58,12 @@ def convert(request, form_class=UserCreationForm,
                 return redirect(redirect_to)
 
         # Invalid form, now check to see if is an ajax call
-        # TODO: Use JsonResponse
         if request.is_ajax():
             return HttpResponseBadRequest(content=str(form.errors))
     else:
         form = form_class()
 
-    return direct_to_template(request, 'lazysignup/convert.html',{
+    return direct_to_template(request, template_name, {
         'form': form,
         'redirect_to': redirect_to
     },)
