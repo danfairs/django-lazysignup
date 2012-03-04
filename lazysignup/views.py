@@ -1,10 +1,10 @@
 from django.conf import settings
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render_to_response
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
+from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic.simple import direct_to_template
 
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
@@ -18,7 +18,9 @@ from lazysignup.models import LazyUser
 @allow_lazy_user
 def convert(request, form_class=UserCreationForm,
             redirect_field_name='redirect_to',
-            anonymous_redirect=settings.LOGIN_URL):
+            anonymous_redirect=settings.LOGIN_URL,
+            template_name='lazysignup/convert.html',
+            ajax_template_name='lazysignup/convert_ajax.html'):
     """ Convert a temporary user to a real one. Reject users who don't
     appear to be temporary users (ie. they have a usable password)
     """
@@ -55,14 +57,18 @@ def convert(request, form_class=UserCreationForm,
                 return HttpResponse()
             else:
                 return redirect(redirect_to)
+
+        # Invalid form, now check to see if is an ajax call
+        if request.is_ajax():
+            return HttpResponseBadRequest(content=str(form.errors))
     else:
         form = form_class()
 
+    # If this is an ajax request, prepend the ajax template to the list of
+    # templates to be searched.
     if request.is_ajax():
-        return HttpResponseBadRequest(content=str(form.errors))
-    else:
-        return direct_to_template(
-            request,
-            'lazysignup/convert.html',
-            {'form': form, 'redirect_to': redirect_to},
-        )
+        template_name = [ajax_template_name, template_name]
+    return render_to_response(template_name, {
+            'form': form,
+            'redirect_to': redirect_to
+        }, context_instance=RequestContext(request))
