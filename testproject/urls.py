@@ -11,6 +11,9 @@ urlpatterns = patterns('',
     (r'^custom_convert/', 'lazysignup.views.convert', {
         'template_name': 'lazysignup/done.html'
         }),
+    (r'^custom_convert_ajax/', 'lazysignup.views.convert', {
+        'ajax_template_name': 'lazysignup/done.html'
+        }),
 )
 
 urlpatterns += patterns('lazysignup.tests',

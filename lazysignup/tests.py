@@ -212,6 +212,15 @@ class LazyTestCase(TestCase):
         self.assertEqual(['lazysignup/done.html'],
             [t.name for t in response.templates])
 
+    def test_convert_ajax_custom_template(self):
+        # If a custom ajax template is provided, then it should be used when
+        # rendering an ajax GET of the convert view. (Usually, this would be
+        # a 'chromeless' version of the regular template)
+        response = self.client.get('/custom_convert_ajax/',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(['lazysignup/done.html'],
+            [t.name for t in response.templates])
+
     def test_convert_non_ajax(self):
         # If it's a regular web browser, we should get a 301.
         self.client.get('/lazy/')
