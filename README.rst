@@ -16,6 +16,8 @@ Tested on Django 1.2.x, though should work on Django 1.0 and later
 (although you  will need to customise one of the templates.) It requires
 ``django.contrib.auth`` to be in the ``INSTALLED_APPS`` list.
 
+Note that from 0.9.0, Django 1.3 or later will be required.
+
 Installation
 ============
 
@@ -174,6 +176,9 @@ user creation. The code requires expects the following:
 The default configuration, using the provided ``UserCreationForm``, should
 be enough for most users, but the customisation point is there if you need
 it.
+
+The view also supports ``template_name`` and ``ajax_template_name`` arguments,
+to specify templates to render in web and ajax contexts respectively.
 
 Custom User classes
 -------------------
