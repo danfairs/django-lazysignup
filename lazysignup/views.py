@@ -55,14 +55,15 @@ def convert(request, form_class=UserCreationForm,
                 return HttpResponse()
             else:
                 return redirect(redirect_to)
+
+        # Invalid form, now check to see if is an ajax call
+        # TODO: Use JsonResponse
+        if request.is_ajax():
+            return HttpResponseBadRequest(content=str(form.errors))
     else:
         form = form_class()
 
-    if request.is_ajax():
-        return HttpResponseBadRequest(content=str(form.errors))
-    else:
-        return direct_to_template(
-            request,
-            'lazysignup/convert.html',
-            {'form': form, 'redirect_to': redirect_to},
-        )
+    return direct_to_template(request, 'lazysignup/convert.html',{
+        'form': form,
+        'redirect_to': redirect_to
+    },)
