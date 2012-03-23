@@ -184,10 +184,10 @@ The ``converted`` signal
 ------------------------
 
 Whenever a temporary user account is converted into a real user account, the
-``lazy_signup.signals.converted`` signal will be sent.  If you need to do any
+``lazysignup.signals.converted`` signal will be sent.  If you need to do any
 processing when an account is converted, you should listen for the signal, eg::
 
-    from lazy_signup.signals import converted
+    from lazysignup.signals import converted
     from django.dispatch import receiver
 
     @receiver(converted)
