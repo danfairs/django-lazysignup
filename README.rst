@@ -180,6 +180,23 @@ it.
 The view also supports ``template_name`` and ``ajax_template_name`` arguments,
 to specify templates to render in web and ajax contexts respectively.
 
+The ``converted`` signal
+------------------------
+
+Whenever a temporary user account is converted into a real user account, the
+``lazy_signup.signals.converted`` signal will be sent.  If you need to do any
+processing when an account is converted, you should listen for the signal, eg::
+
+    from lazy_signup.signals import converted
+    from django.dispatch import receiver
+
+    @receiver(converted)
+    def my_callback(sender, **kwargs):
+        print "New user account: %s!" % kwargs['user'].username
+
+The signal provides a single argument, ``user``, which contains the 
+newly-converted User object.
+
 Custom User classes
 -------------------
 
