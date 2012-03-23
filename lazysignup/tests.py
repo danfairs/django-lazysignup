@@ -26,6 +26,7 @@ from lazysignup.exceptions import NotLazyError
 from lazysignup.management.commands import remove_expired_users
 from lazysignup.models import LazyUser
 from lazysignup.utils import is_lazy_user
+from lazysignup.signals import converted
 
 _missing = object()
 
@@ -485,3 +486,25 @@ class LazyTestCase(TestCase):
         User.objects.create_user(username, '')
         r = lazy_view(self.request)
         self.assertEqual(200, r.status_code)
+
+    def test_converted_signal(self):
+        # The `converted` signal should be dispatched when a user is
+        # successfully converted.
+        user, username = LazyUser.objects.create_lazy_user()
+        d = {
+            'username': 'test',
+            'password1': 'password',
+            'password2': 'password',
+        }
+        form = GoodUserCreationForm(d, instance=user)
+        # setup signal
+        self.handled = False
+        def handler(sender, **kwargs):
+            self.assertEqual(kwargs['user'], user)
+            self.handled = True
+        converted.connect(handler)
+        # convert user
+        user = LazyUser.objects.convert(form)
+        # check signal
+        self.assertTrue(self.handled)
+

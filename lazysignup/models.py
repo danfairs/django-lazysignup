@@ -6,6 +6,7 @@ from django.db import models
 from lazysignup.decorators import USER_AGENT_BLACKLIST
 from lazysignup.exceptions import NotLazyError
 from lazysignup.utils import is_lazy_user
+from lazysignup.signals import converted
 
 DEFAULT_BLACKLIST = (
     'slurp',
@@ -51,6 +52,8 @@ class LazyUserManager(models.Manager):
         # We need to remove the LazyUser instance assocated with the
         # newly-converted user
         self.filter(user=user).delete()
+
+        converted.send(self, user=user)
         return user
 
     def generate_username(self, user_class):
