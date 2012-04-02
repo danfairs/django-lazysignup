@@ -194,7 +194,7 @@ processing when an account is converted, you should listen for the signal, eg::
     def my_callback(sender, **kwargs):
         print "New user account: %s!" % kwargs['user'].username
 
-The signal provides a single argument, ``user``, which contains the 
+The signal provides a single argument, ``user``, which contains the
 newly-converted User object.
 
 Custom User classes
