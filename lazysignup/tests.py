@@ -3,9 +3,9 @@ import hashlib
 from functools import wraps
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user
@@ -21,7 +21,7 @@ from django.views.decorators.http import require_POST
 import mock
 
 from lazysignup.backends import LazySignupBackend
-from lazysignup.decorators import allow_lazy_user
+from lazysignup.decorators import allow_lazy_user, require_lazy_user, require_nonlazy_user
 from lazysignup.exceptions import NotLazyError
 from lazysignup.management.commands import remove_expired_users
 from lazysignup.models import LazyUser
@@ -59,13 +59,22 @@ def view(request):
     return r
 
 
+@allow_lazy_user
 def lazy_view(request):
-    from django.http import HttpResponse
     r = HttpResponse()
     if request.user.is_anonymous() or request.user.has_usable_password():
         r.status_code = 500
     return r
-lazy_view = allow_lazy_user(lazy_view)
+
+
+@require_lazy_user("view-for-nonlazy-users")
+def requires_lazy_view(request):
+    return HttpResponse()
+
+
+@require_nonlazy_user("view-for-lazy-users")
+def requires_nonlazy_view(request):
+    return HttpResponse()
 
 
 def no_lazysignup(func):
@@ -508,3 +517,26 @@ class LazyTestCase(TestCase):
         # check signal
         self.assertTrue(self.handled)
 
+    def test_lazy_user_enters_requires_lazy_decorator(self):
+        self.request.user, _ = LazyUser.objects.create_lazy_user()
+        response = requires_lazy_view(self.request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_lazy_user_enters_requires_nonlazy_decorator(self):
+        self.request.user, _ = LazyUser.objects.create_lazy_user()
+        try:
+            response = requires_nonlazy_view(self.request)
+        except NoReverseMatch, e:
+            self.assert_("view-for-lazy-users" in e.args[0])
+
+    def test_nonlazy_user_enters_requires_nonlazy_decorator(self):
+        self.request.user = AnonymousUser()
+        response = requires_nonlazy_view(self.request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_nonlazy_user_enters_requires_lazy_decorator(self):
+        self.request.user = AnonymousUser()
+        try:
+            response = requires_lazy_view(self.request)
+        except NoReverseMatch, e:
+            self.assert_("view-for-nonlazy-users" in e.args[0])
