@@ -4,6 +4,9 @@ from django.contrib.auth import SESSION_KEY
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user
 from django.contrib.auth import login
+from django.shortcuts import redirect
+from django.utils.decorators import available_attrs
+from lazysignup.utils import is_lazy_user
 
 ALLOW_LAZY_REGISTRY = {}
 USER_AGENT_BLACKLIST = []
@@ -42,3 +45,27 @@ def allow_lazy_user(func):
         return func(request, *args, **kwargs)
 
     return wraps(func)(wrapped)
+
+
+def require_lazy_user(*redirect_args, **redirect_kwargs):
+    def decorator(func):
+        @wraps(func, assigned=available_attrs(func))
+        def inner(request, *args, **kwargs):
+            if is_lazy_user(request.user):
+                return func(request, *args, **kwargs)
+            else:
+                return redirect(*redirect_args, **redirect_kwargs)
+        return inner
+    return decorator
+
+
+def require_nonlazy_user(*redirect_args, **redirect_kwargs):
+    def decorator(func):
+        @wraps(func, assigned=available_attrs(func))
+        def inner(request, *args, **kwargs):
+            if not is_lazy_user(request.user):
+                return func(request, *args, **kwargs)
+            else:
+                return redirect(*redirect_args, **redirect_kwargs)
+        return inner
+    return decorator
