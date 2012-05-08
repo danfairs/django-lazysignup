@@ -95,6 +95,16 @@ For example::
 When accessing the above view, a very simple response containing the generated
 username will be displayed.
 
+``require_lazy_user`` and ``require_nonlazy_user`` decorators
+-------------------------------------------------------------
+
+It is also possible to mark views as requiring only a lazily-created user,
+or requiring only a non-lazy user, with the ``require_lazy_user`` and
+``require_nonlazy_user`` decorators respectively. These decorators take
+arguments and keyword arguments which are passed verbatim to Django's own
+``redirect`` view.
+
+
 The ``is_lazy_user`` template filter
 ------------------------------------
 
@@ -127,6 +137,7 @@ This filter is very simple, and can be used directly in view code, or tests. For
 
 Note that as of version 0.6.0, the user tested no longer needs to have been
 authenticated by the ``LazySignupBackend`` for lazy user detection to work.
+
 
 User agent blacklisting
 -----------------------

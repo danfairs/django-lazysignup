@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.10.1
+------
+
+This is a bugfix release, which included some docs omitted from the 0.10.0
+release.
+
 0.10.0
 ------
 
