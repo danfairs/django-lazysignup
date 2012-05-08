@@ -2,6 +2,16 @@
 Changelog
 =========
 
+0.10.0
+------
+
+This is a feature release. Two new decorators have been added:
+`@require_lazy_user` and `@require_nonlazy_user`.
+
+Thanks to Brad Beattie (bradbeattie) for the implementation and tests, and to
+Adam Coddington (latestrevision) for the original suggestion.
+
+
 0.9.0
 -----
 
