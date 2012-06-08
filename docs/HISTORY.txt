@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.10.2
+------
+
+This is a docs-only release. Docs have converted to Sphinx, for easier
+navigation.
+
 0.10.1
 ------
 
