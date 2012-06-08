@@ -1,12 +1,12 @@
 from setuptools import setup, find_packages
 import os
 
-version = '0.10.2'
+version = '0.10.3'
 
 setup(name='django-lazysignup',
       version=version,
       description="Lazy signup for Django",
-      long_description=open("README.rst").read() + "\n" +
+      long_description=open("README").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       classifiers=[
         "Programming Language :: Python",
@@ -20,7 +20,10 @@ setup(name='django-lazysignup',
       url='http://github.com/danfairs/django-lazysignup',
       license='BSD',
       packages=find_packages(exclude=['ez_setup']),
-      package_data={'lazysignup': ['templates/lazysignup/*html']},
+      package_data={
+        'lazysignup': ['templates/lazysignup/*html'],
+        '': ['*.txt', '*.rst'],
+      },
       namespace_packages=[],
       include_package_data=True,
       zip_safe=False,
