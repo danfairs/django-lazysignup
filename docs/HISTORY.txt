@@ -2,6 +2,23 @@
 Changelog
 =========
 
+0.11.0
+------
+
+This is a feature release, that requires a data migration. Use the
+provided South migration, or add a `created` date/time field to your `LazyUser`
+model manually. This field will be populated when a `LazyUser` instance is
+created, and is set to the current date/time.
+
+A `test-requirements.txt` file has been added to ease installation of test-only
+dependencies.
+
+A new-style DATABASES structure replaces the old DATABASE_* fields.
+
+Versions of Django earlier than 1.4 are no longer supported. Nothing has been
+done to explicitly prevent 1.3.x working, but it will no longer be maintained.
+(Patches to restore support, if it breaks, are welcome.)
+
 0.10.3
 ------
 
