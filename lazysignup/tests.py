@@ -21,7 +21,8 @@ from django.views.decorators.http import require_POST
 import mock
 
 from lazysignup.backends import LazySignupBackend
-from lazysignup.decorators import allow_lazy_user, require_lazy_user, require_nonlazy_user
+from lazysignup.decorators import (allow_lazy_user, require_lazy_user,
+    require_nonlazy_user)
 from lazysignup.exceptions import NotLazyError
 from lazysignup.management.commands import remove_expired_users
 from lazysignup.models import LazyUser
@@ -508,6 +509,7 @@ class LazyTestCase(TestCase):
         form = GoodUserCreationForm(d, instance=user)
         # setup signal
         self.handled = False
+
         def handler(sender, **kwargs):
             self.assertEqual(kwargs['user'], user)
             self.handled = True
@@ -525,7 +527,7 @@ class LazyTestCase(TestCase):
     def test_lazy_user_enters_requires_nonlazy_decorator(self):
         self.request.user, _ = LazyUser.objects.create_lazy_user()
         try:
-            response = requires_nonlazy_view(self.request)
+            requires_nonlazy_view(self.request)
         except NoReverseMatch, e:
             self.assert_("view-for-lazy-users" in e.args[0])
 
@@ -537,6 +539,6 @@ class LazyTestCase(TestCase):
     def test_nonlazy_user_enters_requires_lazy_decorator(self):
         self.request.user = AnonymousUser()
         try:
-            response = requires_lazy_view(self.request)
+            requires_lazy_view(self.request)
         except NoReverseMatch, e:
             self.assert_("view-for-nonlazy-users" in e.args[0])
