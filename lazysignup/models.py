@@ -2,6 +2,7 @@ import re
 import uuid
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 
 from lazysignup.decorators import USER_AGENT_BLACKLIST
 from lazysignup.exceptions import NotLazyError
@@ -72,6 +73,7 @@ class LazyUser(models.Model):
     user = models.ForeignKey(
         getattr(settings, 'LAZYSIGNUP_USER_MODEL', 'auth.User'),
         unique=True)
+    created = models.DateTimeField(default=now)
     objects = LazyUserManager()
 
     @classmethod

@@ -21,7 +21,8 @@ from django.views.decorators.http import require_POST
 import mock
 
 from lazysignup.backends import LazySignupBackend
-from lazysignup.decorators import allow_lazy_user, require_lazy_user, require_nonlazy_user
+from lazysignup.decorators import (allow_lazy_user, require_lazy_user,
+    require_nonlazy_user)
 from lazysignup.exceptions import NotLazyError
 from lazysignup.management.commands import remove_expired_users
 from lazysignup.models import LazyUser
@@ -52,7 +53,6 @@ class GoodUserCreationForm(UserCreationForm):
 
 
 def view(request):
-    from django.http import HttpResponse
     r = HttpResponse()
     if request.user.is_authenticated():
         r.status_code = 500
@@ -106,6 +106,9 @@ class LazyTestCase(TestCase):
     def setUp(self):
         self.request = HttpRequest()
         SessionMiddleware().process_request(self.request)
+
+        # We have to save the session to cause a session key to be generated.
+        self.request.session.save()
 
     @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
     def test_session_already_exists(self, mock_resolve):
@@ -381,8 +384,15 @@ class LazyTestCase(TestCase):
         # that blindly displays the logged-in user's username risks showing
         # most of the session key to the world.
         session_key = self.request.session.session_key
+        assert session_key
         user, username = LazyUser.objects.create_lazy_user()
         self.failIf(session_key.startswith(username))
+
+    def test_created_date(self):
+        # Check that a lazy user has a created field.
+        user, username = LazyUser.objects.create_lazy_user()
+        lazy_user = LazyUser.objects.get(user=user)
+        self.failIf(lazy_user.created is None)
 
     def test_decorator_order(self):
         # It used to be the case that allow_lazy_user had to be first in the
@@ -508,6 +518,7 @@ class LazyTestCase(TestCase):
         form = GoodUserCreationForm(d, instance=user)
         # setup signal
         self.handled = False
+
         def handler(sender, **kwargs):
             self.assertEqual(kwargs['user'], user)
             self.handled = True
@@ -525,7 +536,7 @@ class LazyTestCase(TestCase):
     def test_lazy_user_enters_requires_nonlazy_decorator(self):
         self.request.user, _ = LazyUser.objects.create_lazy_user()
         try:
-            response = requires_nonlazy_view(self.request)
+            requires_nonlazy_view(self.request)
         except NoReverseMatch, e:
             self.assert_("view-for-lazy-users" in e.args[0])
 
@@ -537,6 +548,6 @@ class LazyTestCase(TestCase):
     def test_nonlazy_user_enters_requires_lazy_decorator(self):
         self.request.user = AnonymousUser()
         try:
-            response = requires_lazy_view(self.request)
+            requires_lazy_view(self.request)
         except NoReverseMatch, e:
             self.assert_("view-for-nonlazy-users" in e.args[0])

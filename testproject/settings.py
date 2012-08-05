@@ -1,12 +1,11 @@
 # Settings to be used when running unit tests
 # python manage.py test --settings=lazysignup.test_settings lazysignup
 
-DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = ''
-DATABASE_USER = ''
-DATABASE_PASSWORD = ''
-DATABASE_HOST = ''
-DATABASE_PORT = ''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3'
+    }
+}
 
 INSTALLED_APPS = (
     # Put any other apps that your app depends on here
