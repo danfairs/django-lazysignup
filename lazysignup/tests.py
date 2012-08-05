@@ -53,7 +53,6 @@ class GoodUserCreationForm(UserCreationForm):
 
 
 def view(request):
-    from django.http import HttpResponse
     r = HttpResponse()
     if request.user.is_authenticated():
         r.status_code = 500
@@ -107,6 +106,9 @@ class LazyTestCase(TestCase):
     def setUp(self):
         self.request = HttpRequest()
         SessionMiddleware().process_request(self.request)
+
+        # We have to save the session to cause a session key to be generated.
+        self.request.session.save()
 
     @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
     def test_session_already_exists(self, mock_resolve):
@@ -382,6 +384,7 @@ class LazyTestCase(TestCase):
         # that blindly displays the logged-in user's username risks showing
         # most of the session key to the world.
         session_key = self.request.session.session_key
+        assert session_key
         user, username = LazyUser.objects.create_lazy_user()
         self.failIf(session_key.startswith(username))
 
