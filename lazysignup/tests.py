@@ -388,6 +388,12 @@ class LazyTestCase(TestCase):
         user, username = LazyUser.objects.create_lazy_user()
         self.failIf(session_key.startswith(username))
 
+    def test_created_date(self):
+        # Check that a lazy user has a created field.
+        user, username = LazyUser.objects.create_lazy_user()
+        lazy_user = LazyUser.objects.get(user=user)
+        self.failIf(lazy_user.created is None)
+
     def test_decorator_order(self):
         # It used to be the case that allow_lazy_user had to be first in the
         # decorator list. This is no longer the case.
