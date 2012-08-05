@@ -73,7 +73,7 @@ class LazyUser(models.Model):
     user = models.ForeignKey(
         getattr(settings, 'LAZYSIGNUP_USER_MODEL', 'auth.User'),
         unique=True)
-    created = models.DateTimeField(default=now)
+    created = models.DateTimeField(default=now, db_index=True)
     objects = LazyUserManager()
 
     @classmethod

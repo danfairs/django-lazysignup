@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'LazyUser.created'
         db.add_column('lazysignup_lazyuser', 'created',
-                      self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now),
+                      self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, db_index=True),
                       keep_default=False)
 
 
