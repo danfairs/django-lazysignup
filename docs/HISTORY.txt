@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.11.1
+------
+
+Fix packaging and docs errors.
+
 0.11.0
 ------
 

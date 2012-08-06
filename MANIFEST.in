@@ -1,2 +1,3 @@
 include README
 include LICENSE.txt
+include docs/HISTORY.txt
