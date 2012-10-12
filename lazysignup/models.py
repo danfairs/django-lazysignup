@@ -2,7 +2,11 @@ import re
 import uuid
 from django.conf import settings
 from django.db import models
-from django.utils.timezone import now
+try:
+    from django.utils.timezone import now
+except ImportError:
+    import datetime
+    now = datetime.datetime.now
 
 from lazysignup.decorators import USER_AGENT_BLACKLIST
 from lazysignup.exceptions import NotLazyError
