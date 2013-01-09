@@ -1,7 +1,5 @@
 import django
-print django.VERSION
 django_version = float('%s.%s' % (django.VERSION[0], django.VERSION[1]))
-print django_version
 
 from django.conf.urls.defaults import patterns, url
 
