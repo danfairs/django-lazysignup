@@ -1,4 +1,8 @@
-from django.conf.urls.defaults import patterns, url
+try:
+    from django.conf.urls.defaults import patterns, url
+except ImportError:
+    from django.conf.urls import patterns, url
+
 from django.views.generic import TemplateView
 
 # URL patterns for lazysignup
