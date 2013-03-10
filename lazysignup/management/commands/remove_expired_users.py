@@ -1,7 +1,7 @@
 import datetime
 from django.conf import settings
 from django.core.management.base import NoArgsCommand
-
+from django.utils.timezone import utc
 from lazysignup.models import LazyUser
 
 
@@ -17,7 +17,8 @@ class Command(NoArgsCommand):
             lazy_user.user.delete()
 
     def to_delete(self):
-        delete_before = datetime.datetime.now() - datetime.timedelta(
+        delete_before = datetime.datetime.utcnow().replace(tzinfo=utc) - datetime.timedelta(
             seconds=settings.SESSION_COOKIE_AGE)
+
         return LazyUser.objects.filter(
             user__last_login__lt=delete_before).select_related('user')
