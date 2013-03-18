@@ -1,5 +1,5 @@
 # Settings to be used when running unit tests
-# python testproject/manage.py test lazysignup
+# python manage.py test lazysignup
 
 DATABASES = {
     'default': {
