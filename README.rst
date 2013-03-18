@@ -12,8 +12,6 @@ they can convert their temporary user account to a real user account.
 Tests
 =====
 
-To run the tests, do the following:
+To run the tests, do the following::
 
-```sh
 (cd testproject && python manage.py test lazysignup)
-```
