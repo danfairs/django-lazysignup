@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+import sys
 from functools import wraps
 
 from django.conf import settings
@@ -18,7 +19,10 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.views.decorators.http import require_POST
 
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 from lazysignup.backends import LazySignupBackend
 from lazysignup.decorators import (allow_lazy_user, require_lazy_user,
@@ -132,7 +136,7 @@ class LazyTestCase(TestCase):
         mock_resolve.return_value = (f, None, None)
 
         f(self.request)
-        self.failIf(self.request.user.username is None)
+        self.assertFalse(self.request.user.username is None)
         self.assertEqual(False, self.request.user.has_usable_password())
 
     @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
@@ -142,7 +146,7 @@ class LazyTestCase(TestCase):
         f = allow_lazy_user(lambda request: 1)
         mock_resolve.return_value = (f, None, None)
         f(self.request)
-        self.failIf(self.request.user.username is None)
+        self.assertFalse(self.request.user.username is None)
         self.assertEqual(False, self.request.user.has_usable_password())
 
     @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
@@ -154,7 +158,7 @@ class LazyTestCase(TestCase):
         mock_resolve.return_value = (f, None, None)
 
         f(self.request)
-        self.failIf(hasattr(self.request, 'user'))
+        self.assertFalse(hasattr(self.request, 'user'))
         self.assertEqual(0, len(User.objects.all()))
 
     def test_normal_view(self):
@@ -256,7 +260,7 @@ class LazyTestCase(TestCase):
             'password2': 'passwordx',
         }, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(400, response.status_code)
-        self.failIf(response.content.find('password') == -1)
+        self.assertFalse(response.content.find(b'password') == -1)
         users = User.objects.all()
         self.assertEqual(1, len(users))
         self.assertNotEqual('demo', users[0].username)
@@ -270,7 +274,7 @@ class LazyTestCase(TestCase):
             'password2': 'password',
         }, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(400, response.status_code)
-        self.failIf(response.content.find('username') == -1)
+        self.assertFalse(response.content.find(b'username') == -1)
 
     def test_convert_mismatched_no_ajax(self):
         self.client.get('/lazy/')
@@ -280,7 +284,7 @@ class LazyTestCase(TestCase):
             'password2': 'passwordx',
         })
         self.assertEqual(200, response.status_code)
-        self.failIf(response.content.find('password') == -1)
+        self.assertFalse(response.content.find(b'password') == -1)
         users = User.objects.all()
         self.assertEqual(1, len(users))
         self.assertNotEqual('demo', users[0].username)
@@ -294,7 +298,7 @@ class LazyTestCase(TestCase):
             'password2': 'password',
         })
         self.assertEqual(200, response.status_code)
-        self.failIf(response.content.find('username') == -1)
+        self.assertFalse(response.content.find(b'username') == -1)
 
     def test_convert_existing_user_ajax(self):
         User.objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
@@ -386,13 +390,13 @@ class LazyTestCase(TestCase):
         session_key = self.request.session.session_key
         assert session_key
         user, username = LazyUser.objects.create_lazy_user()
-        self.failIf(session_key.startswith(username))
+        self.assertFalse(session_key.startswith(username))
 
     def test_created_date(self):
         # Check that a lazy user has a created field.
         user, username = LazyUser.objects.create_lazy_user()
         lazy_user = LazyUser.objects.get(user=user)
-        self.failIf(lazy_user.created is None)
+        self.assertFalse(lazy_user.created is None)
 
     def test_decorator_order(self):
         # It used to be the case that allow_lazy_user had to be first in the
@@ -501,7 +505,7 @@ class LazyTestCase(TestCase):
         # now, so we can grab the final session key.
         get_user(self.request)
         key = self.request.session.session_key
-        username = hashlib.sha1(key).hexdigest()[:30]
+        username = hashlib.sha1(key.encode('ascii')).hexdigest()[:30]
         User.objects.create_user(username, '')
         r = lazy_view(self.request)
         self.assertEqual(200, r.status_code)
@@ -537,8 +541,9 @@ class LazyTestCase(TestCase):
         self.request.user, _ = LazyUser.objects.create_lazy_user()
         try:
             requires_nonlazy_view(self.request)
-        except NoReverseMatch, e:
-            self.assert_("view-for-lazy-users" in e.args[0])
+        except NoReverseMatch:
+            e = sys.exc_info()[1]
+            self.assertTrue("view-for-lazy-users" in e.args[0])
 
     def test_nonlazy_user_enters_requires_nonlazy_decorator(self):
         self.request.user = AnonymousUser()
@@ -549,5 +554,6 @@ class LazyTestCase(TestCase):
         self.request.user = AnonymousUser()
         try:
             requires_lazy_view(self.request)
-        except NoReverseMatch, e:
-            self.assert_("view-for-nonlazy-users" in e.args[0])
+        except NoReverseMatch:
+            e = sys.exc_info()[1]
+            self.assertTrue("view-for-nonlazy-users" in e.args[0])
