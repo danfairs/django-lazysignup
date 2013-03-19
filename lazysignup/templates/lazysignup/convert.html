@@ -1,8 +1,9 @@
 {% load i18n %}
+{% load url from future %}
 <html>
   <head>Convert</head>
   <body>
-    <form method="post" action="{% url lazysignup_convert %}">
+    <form method="post" action="{% url 'lazysignup_convert' %}">
       {{ form.as_p }}
       <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
       <input type="submit" value="{% trans "Submit" %}" />
