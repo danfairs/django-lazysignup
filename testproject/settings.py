@@ -33,4 +33,6 @@ LAZYSIGNUP_USER_AGENT_BLACKLIST = [
 
 ROOT_URLCONF = 'testproject.urls'
 
+SECRET_KEY = '12345'
+
 LAZYSIGNUP_USER_MODEL = 'lazysignup.CustomUser'
