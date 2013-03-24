@@ -2,6 +2,15 @@
 Changelog
 =========
 
+0.12.0
+------
+
+Add compatibility with Django 1.5 and Python 3.3. Note that this does not yet
+explicitly support Django 1.5's new pluggable User models in any particular
+way.
+
+Thanks to Brad Pitcher for this work.
+
 0.11.1
 ------
 

@@ -1,12 +1,12 @@
 from setuptools import setup, find_packages
 import os
 
-version = '0.11.1'
+version = '0.12.0'
 
 setup(name='django-lazysignup',
       version=version,
       description="Lazy signup for Django",
-      long_description=open("README").read() + "\n" +
+      long_description=open("README.rst").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       classifiers=[
         "Programming Language :: Python",
