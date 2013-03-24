@@ -1,4 +1,7 @@
-from django.conf.urls.defaults import patterns, url, include
+try:
+    from django.conf.urls import patterns, url, include
+except ImportError:
+    from django.conf.urls.defaults import patterns, url, include
 from django.contrib.auth.forms import UserCreationForm
 
 from lazysignup.tests import GoodUserCreationForm
