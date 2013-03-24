@@ -1,5 +1,5 @@
 # Settings to be used when running unit tests
-# python manage.py test --settings=lazysignup.test_settings lazysignup
+# python manage.py test lazysignup
 
 DATABASES = {
     'default': {
@@ -32,6 +32,7 @@ LAZYSIGNUP_USER_AGENT_BLACKLIST = [
 ]
 
 ROOT_URLCONF = 'testproject.urls'
+SECRET_KEY = 'non-empty-key'
 
 SECRET_KEY = '12345'
 
