@@ -10,6 +10,7 @@ setup(name='django-lazysignup',
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       classifiers=[
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3.3",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Framework :: Django",
         "Development Status :: 4 - Beta",
