@@ -8,8 +8,8 @@ env:
   - DJANGO_VERSION=1.5.0
 # command to install dependencies
 install:
-    pip install -r test-requirements.txt --use-mirrors
-    pip install .
+    - pip install -r test-requirements.txt --use-mirrors
+    - pip install .
 # command to run tests
 script:
     - python testproject/manage.py test --settings=testproject.settings lazysignup
