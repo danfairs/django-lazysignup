@@ -1,1 +1,2 @@
-mock==1.0b1
+Django>=1.4
+mock>=1.0
