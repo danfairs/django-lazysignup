@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.12.1
+------
+
+Fix a packaging error. Thanks to Tamas Mako (tomako) for reporting it.
+
 0.12.0
 ------
 
