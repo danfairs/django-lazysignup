@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.12.2
+------
+
+Fix another packaging error. Thanks to David Eyk (eykd) for the pull request.
+
 0.12.1
 ------
 
