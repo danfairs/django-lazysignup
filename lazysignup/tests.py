@@ -25,8 +25,11 @@ except ImportError:
     import mock
 
 from lazysignup.backends import LazySignupBackend
-from lazysignup.decorators import (allow_lazy_user, require_lazy_user,
-    require_nonlazy_user)
+from lazysignup.decorators import (
+    allow_lazy_user,
+    require_lazy_user,
+    require_nonlazy_user
+)
 from lazysignup.exceptions import NotLazyError
 from lazysignup.management.commands import remove_expired_users
 from lazysignup.models import LazyUser
