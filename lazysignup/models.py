@@ -68,9 +68,11 @@ class LazyUserManager(models.Manager):
         if m:
             return m()
         else:
-            max_length = user_class._meta.get_field(
-                self.username_field).max_length
-            return uuid.uuid4().hex[:max_length]
+            if not LazyUser.objects.exists():
+                new_pk = 0
+            else:
+                new_pk = LazyUser.objects.latest('id').pk + 1
+            return "user-%d" % (new_pk)
 
 
 class LazyUser(models.Model):
