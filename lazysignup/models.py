@@ -13,6 +13,8 @@ from lazysignup.exceptions import NotLazyError
 from lazysignup.utils import is_lazy_user
 from lazysignup.signals import converted
 
+from lazysignup.settings import LAZY_USER_DEFAULT_EMAIL
+
 DEFAULT_BLACKLIST = (
     'slurp',
     'googlebot',
@@ -36,7 +38,7 @@ class LazyUserManager(models.Manager):
         """
         user_class = self.model.get_user_class()
         username = self.generate_username(user_class)
-        user = user_class.objects.create_user(username, '')
+        user = user_class.objects.create_user(username, LAZY_USER_DEFAULT_EMAIL)
         self.create(user=user)
         return user, username
 
