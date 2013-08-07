@@ -1,6 +1,7 @@
 import re
 import uuid
 from django.conf import settings
+from django.contrib.auth.signals import user_logged_in
 from django.db import models
 try:
     from django.utils.timezone import now

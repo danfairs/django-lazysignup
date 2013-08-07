@@ -560,3 +560,31 @@ class LazyTestCase(TestCase):
         except NoReverseMatch:
             e = sys.exc_info()[1]
             self.assertTrue("view-for-nonlazy-users" in e.args[0])
+
+    def test_lazy_logs_in(self):
+        # If a lazy user logs into an existing acount, we should find that the
+        # lazy_user_logged_in signal is fired, with the old lazy user and the
+        # new authenticated user as arguments
+        from lazysignup.signals import lazy_user_logged_in
+        u = User.objects.create_user('foo', 'foo@foo.com', 'foo')
+        response = self.client.get('/lazy/')
+        lazy_user = User.objects.get(pk=self.client.session['_auth_user_id'])
+
+        # We should find that a cookie has been set so that lazysignup
+        # can detect that a user who logs in used to be lazy
+        cookie = response.cookies['_lazy_user_name']
+        self.assertEqual(lazy_user.username, cookie.value)
+
+        def listener(*args, **kwargs):
+            listener.executed = True
+            listener.args = args
+            listener.kwargs = kwargs
+
+        lazy_user_logged_in.connect(listener)
+        u.backend = 'some.backend'
+        login(self.request, u)
+
+        self.assertTrue(listener.executed)
+        self.assertEqual(self.request, listener.kwargs['request'])
+        self.assertEqual(u, listener.kwargs['user'])
+        self.assertEqual(lazy_user, listener.kwargs['lazy_user'])
