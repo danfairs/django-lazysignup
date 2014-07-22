@@ -1,35 +1,38 @@
 import datetime
-from functools import wraps
 import hashlib
 import sys
+from functools import wraps
 
 from django.conf import settings
-from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, authenticate, \
-    get_user, login
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import AnonymousUser, User, UserManager
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.http import HttpRequest, HttpResponse
+from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
+from django.contrib.auth import authenticate
+from django.contrib.auth import get_user
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import User
+from django.contrib.auth.models import UserManager
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.views.decorators.http import require_POST
-
-from lazysignup.backends import LazySignupBackend
-from lazysignup.decorators import allow_lazy_user, require_lazy_user, \
-    require_nonlazy_user
-from lazysignup.exceptions import NotLazyError
-from lazysignup.management.commands import remove_expired_users
-from lazysignup.models import LazyUser
-from lazysignup.signals import converted
-from lazysignup.utils import is_lazy_user
-
 
 try:
     from unittest import mock
 except ImportError:
     import mock
+
+from lazysignup.backends import LazySignupBackend
+from lazysignup.decorators import (allow_lazy_user, require_lazy_user,
+    require_nonlazy_user)
+from lazysignup.exceptions import NotLazyError
+from lazysignup.management.commands import remove_expired_users
+from lazysignup.models import LazyUser
+from lazysignup.utils import is_lazy_user
+from lazysignup.signals import converted
 
 
 _missing = object()

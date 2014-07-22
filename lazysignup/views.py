@@ -1,11 +1,14 @@
 from django.conf import settings
-from django.contrib.auth import authenticate, login
-from django.http import HttpResponse, HttpResponseBadRequest, \
-    HttpResponseRedirect
 from django.shortcuts import redirect, render_to_response, resolve_url
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.http import HttpResponseBadRequest
 from django.template import RequestContext
-from django.utils.http import is_safe_url
 from django.utils.translation import ugettext_lazy as _
+from django.utils.http import is_safe_url
+
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
 
 from lazysignup.decorators import allow_lazy_user
 from lazysignup.exceptions import NotLazyError
