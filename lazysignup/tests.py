@@ -34,7 +34,6 @@ from lazysignup.models import LazyUser
 from lazysignup.utils import is_lazy_user
 from lazysignup.signals import converted
 
-
 _missing = object()
 
 
