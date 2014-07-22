@@ -1,13 +1,11 @@
 from django.conf import settings
-from django.shortcuts import redirect, render_to_response
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.http import HttpResponseBadRequest
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponse, HttpResponseBadRequest, \
+    HttpResponseRedirect
+from django.shortcuts import redirect, render_to_response, resolve_url
 from django.template import RequestContext
+from django.utils.http import is_safe_url
 from django.utils.translation import ugettext_lazy as _
-
-from django.contrib.auth import authenticate
-from django.contrib.auth import login
 
 from lazysignup.decorators import allow_lazy_user
 from lazysignup.exceptions import NotLazyError
@@ -17,23 +15,31 @@ from lazysignup.models import LazyUser
 
 @allow_lazy_user
 def convert(request, form_class=UserCreationForm,
-            redirect_field_name='redirect_to',
+            redirect_field_name='next',
             anonymous_redirect=settings.LOGIN_URL,
             template_name='lazysignup/convert.html',
             ajax_template_name='lazysignup/convert_ajax.html'):
     """ Convert a temporary user to a real one. Reject users who don't
     appear to be temporary users (ie. they have a usable password)
     """
-    redirect_to = 'lazysignup_convert_done'
+    # Get redirect from GET params, or use value from settings, defaulting
+    # to provided "done" view
+    default_redirect_url = getattr(settings, "LAZY_CONVERT_SUCCESS_URL",
+                           'lazysignup_convert_done')
+    redirect_to = request.REQUEST.get(redirect_field_name, default_redirect_url)
 
     # If we've got an anonymous user, redirect to login
     if request.user.is_anonymous():
         return HttpResponseRedirect(anonymous_redirect)
 
     if request.method == 'POST':
-        redirect_to = request.POST.get(redirect_field_name) or redirect_to
         form = form_class(request.POST, instance=request.user)
         if form.is_valid():
+
+            # Ensure the user-originating redirection url is safe.
+            if not is_safe_url(url=redirect_to, host=request.get_host()):
+                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+
             try:
                 LazyUser.objects.convert(form)
             except NotLazyError:
@@ -70,5 +76,5 @@ def convert(request, form_class=UserCreationForm,
         template_name = [ajax_template_name, template_name]
     return render_to_response(template_name, {
             'form': form,
-            'redirect_to': redirect_to
+            redirect_field_name: redirect_to,
         }, context_instance=RequestContext(request))

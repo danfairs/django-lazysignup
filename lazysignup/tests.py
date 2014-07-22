@@ -1,37 +1,36 @@
 import datetime
+from functools import wraps
 import hashlib
 import sys
-from functools import wraps
 
 from django.conf import settings
+from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, authenticate, \
+    get_user, login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import AnonymousUser, User, UserManager
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.http import HttpRequest, HttpResponse
-from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
-from django.contrib.auth import authenticate
-from django.contrib.auth import get_user
-from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.auth.models import User
-from django.contrib.auth.models import UserManager
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.views.decorators.http import require_POST
+
+from lazysignup.backends import LazySignupBackend
+from lazysignup.decorators import allow_lazy_user, require_lazy_user, \
+    require_nonlazy_user
+from lazysignup.exceptions import NotLazyError
+from lazysignup.management.commands import remove_expired_users
+from lazysignup.models import LazyUser
+from lazysignup.signals import converted
+from lazysignup.utils import is_lazy_user
+
 
 try:
     from unittest import mock
 except ImportError:
     import mock
 
-from lazysignup.backends import LazySignupBackend
-from lazysignup.decorators import (allow_lazy_user, require_lazy_user,
-    require_nonlazy_user)
-from lazysignup.exceptions import NotLazyError
-from lazysignup.management.commands import remove_expired_users
-from lazysignup.models import LazyUser
-from lazysignup.utils import is_lazy_user
-from lazysignup.signals import converted
 
 _missing = object()
 
@@ -61,6 +60,10 @@ def view(request):
     if request.user.is_authenticated():
         r.status_code = 500
     return r
+
+
+def redirect_view(request):
+    return HttpResponse("Redirected")
 
 
 @allow_lazy_user
@@ -251,6 +254,31 @@ class LazyTestCase(TestCase):
         users = User.objects.all()
         self.assertEqual(1, len(users))
         self.assertEqual('demo', users[0].username)
+
+    def test_convert_redirects_to_next(self):
+        # test redirecting after conversion
+        self.client.get('/lazy/')
+        next_url = reverse('test_redirect_view')
+        response = self.client.post('/convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'password',
+            'next': next_url
+        })
+        self.assertRedirects(response, expected_url=next_url,
+                             status_code=302)
+
+    @override_settings(LAZY_CONVERT_SUCCESS_URL='foo')
+    def test_get_next_url_from_settings(self):
+        # test 'next' param from settings
+        response = self.client.get('/convert/')
+        self.assertDictContainsSubset({"next": settings.LAZY_CONVERT_SUCCESS_URL}, response.context)
+
+    def test_get_next_url_from_url(self):
+        # test 'next' param in url
+        response = self.client.get('/convert/?next=bar')
+        self.assertDictContainsSubset({"next": 'bar'}, response.context)
+
 
     def test_convert_mismatched_passwords_ajax(self):
         self.client.get('/lazy/')
