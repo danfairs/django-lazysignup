@@ -17,6 +17,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import UserManager
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.views.decorators.http import require_POST
 
 try:
@@ -61,6 +62,10 @@ def view(request):
     if request.user.is_authenticated():
         r.status_code = 500
     return r
+
+
+def redirect_view(request):
+    return HttpResponse("Redirected")
 
 
 @allow_lazy_user
@@ -251,6 +256,31 @@ class LazyTestCase(TestCase):
         users = User.objects.all()
         self.assertEqual(1, len(users))
         self.assertEqual('demo', users[0].username)
+
+    def test_convert_redirects_to_next(self):
+        # test redirecting after conversion
+        self.client.get('/lazy/')
+        next_url = reverse('test_redirect_view')
+        response = self.client.post('/convert/', {
+            'username': 'demo',
+            'password1': 'password',
+            'password2': 'password',
+            'next': next_url
+        })
+        self.assertRedirects(response, expected_url=next_url,
+                             status_code=302)
+
+    @override_settings(LAZY_CONVERT_SUCCESS_URL='foo')
+    def test_get_next_url_from_settings(self):
+        # test 'next' param from settings
+        response = self.client.get('/convert/')
+        self.assertDictContainsSubset({"next": settings.LAZY_CONVERT_SUCCESS_URL}, response.context)
+
+    def test_get_next_url_from_url(self):
+        # test 'next' param in url
+        response = self.client.get('/convert/?next=bar')
+        self.assertDictContainsSubset({"next": 'bar'}, response.context)
+
 
     def test_convert_mismatched_passwords_ajax(self):
         self.client.get('/lazy/')

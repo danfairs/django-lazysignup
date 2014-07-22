@@ -22,6 +22,7 @@ urlpatterns = patterns('',
 urlpatterns += patterns('lazysignup.tests',
     url(r'^nolazy/$', 'view', name='test_view'),
     url(r'^lazy/$', 'lazy_view', name='test_lazy_view'),
+    url(r'^redirect/$', 'redirect_view', name='test_redirect_view')
 )
 
 urlpatterns += patterns('lazysignup.views',
