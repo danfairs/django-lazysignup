@@ -54,7 +54,8 @@ def convert(request, form_class=UserCreationForm,
 
             # Re-log the user in, as they'll now not be authenticatable with
             # the Lazy backend
-            login(request, authenticate(**form.get_credentials()))
+            if getattr(settings, 'AUTO_LOGIN_ON_LAZY_CONVERSION', True):
+                login(request, authenticate(**form.get_credentials()))
 
             # If we're being called via AJAX, then we just return a 200
             # directly to the client. If not, then we redirect to a
