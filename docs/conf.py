@@ -11,7 +11,19 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import os
+import re
+
+def get_version():
+    """
+    Extracts the version number from the version.py file.
+    """
+    VERSION_FILE = '../lazysignup/version.py'
+    mo = re.search(r'^__version__ = [\'"]([^\'"]*)[\'"]', open(VERSION_FILE, 'rt').read(), re.M)
+    if mo:
+        return mo.group(1)
+    else:
+        raise RuntimeError('Unable to find version string in {0}.'.format(VERSION_FILE))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -25,7 +37,6 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = []
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -48,7 +59,7 @@ copyright = u'2012, Dan Fairs'
 # built documents.
 #
 # The short X.Y version.
-version = '0.11.1'
+version = get_version()
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -93,6 +104,13 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 html_theme = 'default'
 
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if not on_rtd:  # only import and set the theme if we're building docs locally
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+# Add any paths that contain custom static files (such as style sheets) here,
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.

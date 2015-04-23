@@ -1,18 +1,16 @@
 import re
 import uuid
+
 from django.conf import settings
 from django.db import models
-try:
-    from django.utils.timezone import now
-except ImportError:
-    import datetime
-    now = datetime.datetime.now
+from django.utils.timezone import now
+import six
 
-from lazysignup.decorators import USER_AGENT_BLACKLIST
+from lazysignup.constants import USER_AGENT_BLACKLIST
 from lazysignup.exceptions import NotLazyError
 from lazysignup.utils import is_lazy_user
 from lazysignup.signals import converted
-
+from lazysignup import constants
 DEFAULT_BLACKLIST = (
     'slurp',
     'googlebot',
@@ -21,12 +19,17 @@ DEFAULT_BLACKLIST = (
     'baiduspider',
 )
 
-for user_agent in getattr(settings, 'LAZYSIGNUP_USER_AGENT_BLACKLIST',
-    DEFAULT_BLACKLIST):
+for user_agent in getattr(settings, 'LAZYSIGNUP_USER_AGENT_BLACKLIST', DEFAULT_BLACKLIST):
     USER_AGENT_BLACKLIST.append(re.compile(user_agent, re.I))
 
 
 class LazyUserManager(models.Manager):
+
+    def __hash__(self):
+        """
+        Implemented so signal can be sent in .convert() for Django 1.8
+        """
+        return hash(str(self))
 
     username_field = 'username'
 
@@ -57,7 +60,6 @@ class LazyUserManager(models.Manager):
         # We need to remove the LazyUser instance assocated with the
         # newly-converted user
         self.filter(user=user).delete()
-
         converted.send(self, user=user)
         return user
 
@@ -73,13 +75,15 @@ class LazyUserManager(models.Manager):
             return uuid.uuid4().hex[:max_length]
 
 
+@six.python_2_unicode_compatible
 class LazyUser(models.Model):
-    user = models.ForeignKey(
-        getattr(settings, 'LAZYSIGNUP_USER_MODEL', 'auth.User'),
-        unique=True)
+    user = models.OneToOneField(constants.LAZYSIGNUP_USER_MODEL)
     created = models.DateTimeField(default=now, db_index=True)
     objects = LazyUserManager()
 
     @classmethod
     def get_user_class(cls):
         return cls._meta.get_field('user').rel.to
+
+    def __str__(self):
+        return '{0}:{1}'.format(self.user, self.created)

@@ -1,4 +1,5 @@
 from functools import wraps
+
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth import authenticate
@@ -6,10 +7,11 @@ from django.contrib.auth import get_user
 from django.contrib.auth import login
 from django.shortcuts import redirect
 from django.utils.decorators import available_attrs
+
+from lazysignup.constants import USER_AGENT_BLACKLIST
 from lazysignup.utils import is_lazy_user
 
 ALLOW_LAZY_REGISTRY = {}
-USER_AGENT_BLACKLIST = []
 
 
 def allow_lazy_user(func):

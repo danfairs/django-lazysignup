@@ -18,7 +18,7 @@ will return ``True``. See below for more information on ``is_lazy_user``.
 A view is provided to allow such users to convert their temporary account into
 a real user account by providing a username and a password.
 
-A Django management command is provided to clear out stale, uncoverted user
+A Django management command is provided to clear out stale, unconverted user
 accounts - although this depends on your use of database-backed sessions, and
 assumes that all user accounts with an expired session are safe to delete. This
 may not be the case for all apps, so you may wish to provide your own cleaning
@@ -42,8 +42,8 @@ For example::
 When accessing the above view, a very simple response containing the generated
 username will be displayed.
 
-``require_lazy_user`` and ``require_nonlazy_user`` decorators
--------------------------------------------------------------
+The ``require_lazy_user`` and ``require_nonlazy_user`` decorators
+-----------------------------------------------------------------
 
 It is also possible to mark views as requiring only a lazily-created user,
 or requiring only a non-lazy user, with the ``require_lazy_user`` and
@@ -116,7 +116,7 @@ a username, password and password confirmation. As long as they fill in valid
 details, their temporary user account will be converted into a real user
 account that they can log in with as usual.
 
-You may pass your own form class into the `convert` view in order to customise
+You may specify your own form class into the `convert` view in order to customise
 user creation. The code requires expects the following:
 
   - It expects to be able to create the form passing in the generated ``User``
@@ -134,6 +134,11 @@ user creation. The code requires expects the following:
 The default configuration, using the provided ``UserCreationForm``, should
 be enough for most users, but the customisation point is there if you need
 it.
+
+To specify your own form, set the ``LAZYSIGNUP_CUSTOM_USER_CREATION_FORM``
+setting to your settings file like so::
+
+  LAZYSIGNUP_CUSTOM_USER_CREATION_FORM = 'myproject.apps.myapp.forms.MyForm'
 
 The view also supports ``template_name`` and ``ajax_template_name`` arguments,
 to specify templates to render in web and ajax contexts respectively.

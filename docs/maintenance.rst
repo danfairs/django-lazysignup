@@ -10,12 +10,13 @@ a regular basis. It runs from the command line::
 
 In a production environment, this should be run from cron or similar.
 
-This works be removing user accounts from the system whose associated sessions
+There is also an action in the Django Admin for removing expired users. To use,
+select all LazyUser instances, select the action "Delete selected lazy users
+and unconverted users older than settings.SESSION_COOKIE_AGE", and click "Go".
+
+This works by removing user accounts from the system whose associated sessions
 have expired. ``user.delete()`` is called for each user, so related data will
 be removed as well.
 
 Note of course that these deletes will cascade, so if you need to keep data
-associated with such users, you'll need to write your own cleanup job. If
-that's not the case, then you'll again need to write your own cleanup.
-Finally, if you're using a custom user class where the user isn't a subclass
-of Django's own user model, you'll again need your own cleanup script.
+associated with such users, you'll need to write your own cleanup job.
