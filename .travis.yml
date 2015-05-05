@@ -1,18 +1,33 @@
+sudo: false
 language: python
 python:
-  - "2.6"
   - "2.7"
-  - "3.3"
+  - "3.4"
+addons:
+  postgresql: '9.3'
 env:
-  - DJANGO_VERSION=1.4.5
-  - DJANGO_VERSION=1.5.1
+  matrix:
+    - DJANGO_VERSION=">=1.7,<1.8" DB="postgres"
+    - DJANGO_VERSION=">=1.8,<1.9" DB="postgres"
+    - DJANGO_VERSION=">=1.7,<1.8" DB="mysql"
+    - DJANGO_VERSION=">=1.8,<1.9" DB="mysql"
 # command to install dependencies
 install:
-    - pip install -r test-requirements.txt --use-mirrors
-    - pip install .
+  - pip install Django$DJANGO_VERSION flake8 coverage
+  - pip install -e .[all]
 # command to run tests
+before_script:
+  - psql -c 'CREATE DATABASE lazysignup;' -U postgres
+  - mysql -e 'CREATE DATABASE lazysignup;'
 script:
-    - python testproject/manage.py test --settings=testproject.settings lazysignup
+  - flake8 .
+  - coverage run manage.py test --settings=lazysignup.tests.settings
+  - coverage report --fail-under=98
+  - psql -c 'DROP DATABASE IF EXISTS test_lazysignup;' -U postgres
+  - mysql -e 'DROP DATABASE IF EXISTS test_lazysignup;'
+  - coverage erase
+  - coverage run manage.py test --settings=custom_user_tests.settings
+  - coverage report --fail-under=98
 branches:
-    except:
-        - 33-late-logins
+  except:
+    - 33-late-logins

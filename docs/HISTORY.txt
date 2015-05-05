@@ -2,6 +2,13 @@
 Changelog
 =========
 
+1.0.0
+-----
+* Add support for Django 1.7 migrations
+* Drop support for Django 1.6 and earlier
+* Add tests for custom user model
+* Migrated lazy_user's user to a OneToOneField() from a ForeignKey(unique=True)
+
 0.12.2
 ------
 

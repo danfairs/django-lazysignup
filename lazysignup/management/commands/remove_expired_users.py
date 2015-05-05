@@ -1,5 +1,6 @@
 import datetime
 from django.conf import settings
+
 from django.core.management.base import NoArgsCommand
 
 from lazysignup.models import LazyUser
@@ -20,4 +21,5 @@ class Command(NoArgsCommand):
         delete_before = datetime.datetime.now() - datetime.timedelta(
             seconds=settings.SESSION_COOKIE_AGE)
         return LazyUser.objects.filter(
-            user__last_login__lt=delete_before).select_related('user')
+            user__last_login__lt=delete_before
+        ).select_related('user')

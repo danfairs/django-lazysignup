@@ -1,22 +1,23 @@
 from django.conf import settings
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
 from django.shortcuts import redirect, render_to_response
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
-
-from django.contrib.auth import authenticate
-from django.contrib.auth import login
+from django.utils.module_loading import import_string
 
 from lazysignup.decorators import allow_lazy_user
 from lazysignup.exceptions import NotLazyError
-from lazysignup.forms import UserCreationForm
 from lazysignup.models import LazyUser
+from lazysignup.forms import UserCreationForm
+from lazysignup import constants
 
 
 @allow_lazy_user
-def convert(request, form_class=UserCreationForm,
+def convert(request, form_class=None,
             redirect_field_name='redirect_to',
             anonymous_redirect=settings.LOGIN_URL,
             template_name='lazysignup/convert.html',
@@ -25,6 +26,12 @@ def convert(request, form_class=UserCreationForm,
     appear to be temporary users (ie. they have a usable password)
     """
     redirect_to = 'lazysignup_convert_done'
+
+    if form_class is None:
+        if constants.LAZYSIGNUP_CUSTOM_USER_CREATION_FORM is not None:
+            form_class = import_string(constants.LAZYSIGNUP_CUSTOM_USER_CREATION_FORM)
+        else:
+            form_class = UserCreationForm
 
     # If we've got an anonymous user, redirect to login
     if request.user.is_anonymous():
@@ -68,7 +75,11 @@ def convert(request, form_class=UserCreationForm,
     # templates to be searched.
     if request.is_ajax():
         template_name = [ajax_template_name, template_name]
-    return render_to_response(template_name, {
+    return render_to_response(
+        template_name,
+        {
             'form': form,
             'redirect_to': redirect_to
-        }, context_instance=RequestContext(request))
+        },
+        context_instance=RequestContext(request)
+    )
