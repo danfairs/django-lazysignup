@@ -2,3 +2,5 @@ include README.rst
 include LICENSE.txt
 include docs/HISTORY.txt
 recursive-include lazysignup/templates *.html
+prune custom_user_tests
+prune lazysignup/tests
