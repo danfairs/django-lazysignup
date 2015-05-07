@@ -48,3 +48,11 @@ To build and view the documentation, run ::
     python setup.py build_sphinx
     open docs/_build/html/index.html
 
+Releasing
+---------
+
+Releasing to pypi is as simple as::
+
+    pip install -e .[all]
+    python setup.py sdist bdist_wheel upload
+

@@ -63,16 +63,7 @@ setup(
         "License :: OSI Approved :: BSD License"
     ],
     license='BSD',
-    packages=find_packages(
-        'lazysignup',
-        exclude='tests',
-    ),
-    package_dir={'': 'lazysignup'},
-    package_data={
-        'lazysignup': ['templates/lazysignup/*html'],
-        '': ['*.txt', '*.rst'],
-    },
-    namespace_packages=[],
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     install_requires=install_requires,
