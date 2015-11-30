@@ -26,7 +26,7 @@ tests_require = [
 install_requires = [
     'setuptools',
     'Django>=1.7',
-    'six>=1.8'
+    'six>=1.9'
 ]
 
 extras_require = {
