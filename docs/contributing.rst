@@ -15,8 +15,8 @@ do:
   pip install -e .[all]
 
   # To test against a PostgreSQL Database locally
-  psql -C "CREATE USER lazysignup with login createdb password 'lazysignup';"
-  psql -C "CREATE DATABASE lazysignup with OWNER lazysignup;"
+  psql -c "CREATE USER lazysignup with login createdb password 'lazysignup';"
+  psql -c "CREATE DATABASE lazysignup with OWNER lazysignup;"
   export DB="local-postgres"
 
   # To test against a MySQL Database locally
