@@ -4,6 +4,7 @@
   <head>Convert</head>
   <body>
     <form method="post" action="{% url 'lazysignup_convert' %}">
+      {% csrf_token %}
       {{ form.as_p }}
       <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
       <input type="submit" value="{% trans "Submit" %}" />
