@@ -1,41 +1,39 @@
 import os
 
-test_db = os.environ.get('DB', None)
-
-if test_db == 'sqlite' or test_db is None:
-    # Default is SQLite
-    db_config = {
+DB_CONFIGS = {
+    'sqlite': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'lazysignup',
-    }
-elif test_db == 'postgres':
-    db_config = {
+    },
+    'postgres': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'USER': 'postgres',
         'NAME': 'lazysignup',
-    }
-elif test_db == 'local-postgres':
-    db_config = {
+    },
+    'local-postgres': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'lazysignup',
         'USER': 'lazysignup',
         'PASSWORD': 'lazysignup',
         'HOST': 'localhost'
-    }
-elif test_db == 'mysql':
-    db_config = {
+    },
+    'mysql': {
         'ENGINE': 'django.db.backends.mysql',
         'USER': 'travis',
         'NAME': 'lazysignup',
-    }
-elif test_db == 'local-mysql':
-    db_config = {
+    },
+    'local-mysql': {
         'ENGINE': 'django.db.backends.mysql',
         'USER': 'lazysignup',
         'NAME': 'lazysignup',
         'PASSWORD': 'lazysignup',
     }
-else:
+}
+
+test_db = os.environ.get('DB', 'sqlite')
+try:
+    db_config = DB_CONFIGS[test_db]
+except KeyError:
     raise RuntimeError('Unsupported test DB {0}'.format(test_db))
 
 DATABASES = {
