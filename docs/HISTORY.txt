@@ -2,6 +2,13 @@
 Changelog
 =========
 
+1.0.2
+-----
+
+* Add `csrf_token` to convert form (thanks jnoss)
+* Fix dependency on incorrect version of `six` (#47)
+* Minor tidy of the way databases are selected in tests
+
 1.0.1
 -----
 * Fix packaging issue
