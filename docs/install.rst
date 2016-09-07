@@ -1,10 +1,8 @@
 Requirements
 ============
 
-Tested on Django 1.7 through 1.8, It requires ``django.contrib.auth`` to be in
+Tested on Django 1.10.0 and above. It requires ``django.contrib.auth`` to be in
 the ``INSTALLED_APPS`` list.
-
-Note that from 1.0, Django 1.7 or later will be required.
 
 Installation
 ============
@@ -26,7 +24,7 @@ site's ``AUTHENTICATION_BACKENDS`` setting::
 Finally, you need to add lazysignup to your URLConf, using something like
 this::
 
-  urlpatterns += (''
-      (r'^convert/', include('lazysignup.urls')),
+  urlpatterns += (
+      url(r'^convert/', include('lazysignup.urls')),
   )
 

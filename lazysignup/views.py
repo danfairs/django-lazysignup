@@ -1,11 +1,10 @@
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
-from django.shortcuts import redirect, render_to_response
+from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
-from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 from django.utils.module_loading import import_string
 
@@ -75,11 +74,11 @@ def convert(request, form_class=None,
     # templates to be searched.
     if request.is_ajax():
         template_name = [ajax_template_name, template_name]
-    return render_to_response(
+    return render(
+        request,
         template_name,
         {
             'form': form,
             'redirect_to': redirect_to
         },
-        context_instance=RequestContext(request)
     )

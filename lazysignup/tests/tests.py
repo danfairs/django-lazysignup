@@ -300,7 +300,7 @@ class LazyTestCase(TestCase):
         response = self.client.get('/convert/')
         self.assertEqual(302, response.status_code)
         self.assertEqual(
-            'http://testserver' + settings.LOGIN_URL,
+            settings.LOGIN_URL,
             response['location']
         )
 

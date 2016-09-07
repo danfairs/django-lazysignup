@@ -72,3 +72,21 @@ AUTH_USER_MODEL = 'custom_user_tests.CustomUser'
 ROOT_URLCONF = 'lazysignup.tests.urls'
 SECRET_KEY = 'non-empty-key'
 DEBUG = False
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                "django.template.context_processors.i18n",
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                "django.template.context_processors.tz",
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]

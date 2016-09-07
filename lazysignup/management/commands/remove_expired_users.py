@@ -1,16 +1,16 @@
 import datetime
 from django.conf import settings
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 from lazysignup.models import LazyUser
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = u"""Remove all users whose sessions have expired and who haven't
                set a password. This assumes you are using database sessions"""
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         # Delete each of these users. We don't use the queryset delete()
         # because we want cascades to work (including, of course, the LazyUser
         # object itself)

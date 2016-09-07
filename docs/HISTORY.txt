@@ -2,6 +2,15 @@
 Changelog
 =========
 
+1.1.0
+-----
+
+This is a compatibility release with Django 1.10.0. This is now the minimum
+supported version. If you require compatibility with versions below that,
+please use version 1.0.2.
+
+* Fix URL patterns for 1.10.0 compat (#49 ,thanks kevinmickey and nschlemm)
+
 1.0.2
 -----
 
