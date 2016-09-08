@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.1.1
+-----
+
+Fix small error in setup.py classifiers, as we now only support Django 1.10
+and above.
+
 1.1.0
 -----
 

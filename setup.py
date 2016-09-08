@@ -57,8 +57,7 @@ setup(
         "Programming Language :: Python :: 3.4",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Framework :: Django",
-        "Framework :: Django :: 1.7",
-        "Framework :: Django :: 1.8",
+        "Framework :: Django :: 1.10",
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: BSD License"
     ],
