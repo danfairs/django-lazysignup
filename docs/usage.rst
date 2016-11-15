@@ -89,7 +89,7 @@ authenticated by the ``LazySignupBackend`` for lazy user detection to work.
 User agent blacklisting
 -----------------------
 
-The middleware will not created users for certain requests from blacklisted
+The middleware will not create users for certain requests from blacklisted
 user agents. This is simply a fairly crude method for preventing many spurious
 users being created by passing search engines.
 
