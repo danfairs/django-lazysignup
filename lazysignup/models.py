@@ -11,6 +11,7 @@ from lazysignup.exceptions import NotLazyError
 from lazysignup.utils import is_lazy_user
 from lazysignup.signals import converted
 from lazysignup import constants
+from django.contrib.auth import get_user_model
 DEFAULT_BLACKLIST = (
     'slurp',
     'googlebot',
@@ -31,7 +32,7 @@ class LazyUserManager(models.Manager):
         """
         return hash(str(self))
 
-    username_field = constants.LAZYSIGNUP_USER_NAME_FIELD
+    username_field = get_user_model().USERNAME_FIELD
 
     def create_lazy_user(self):
         """ Create a lazy user. Returns a 2-tuple of the underlying User
