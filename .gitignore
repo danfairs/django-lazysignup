@@ -13,6 +13,8 @@ docs/_build
 
 # Pycharm
 .idea/
+.project
+*.iml
 
 # Virtual environments
 venv/
