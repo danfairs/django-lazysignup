@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.2.0
+-----
+
+Allow a field other than `username` to be used to better support custom users.
+(#56, thanks pashinin)
+
 1.1.1
 -----
 

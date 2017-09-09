@@ -49,7 +49,7 @@ setup(
     long_description=open("README.rst").read() + "\n" + open(os.path.join("docs", "HISTORY.txt")).read(),
     url='http://github.com/danfairs/django-lazysignup',
     author='Dan Fairs',
-    author_email='dan@fezconsulting.com',
+    author_email='dan.fairs@gmail.com',
     keywords='django lazy signup app user',
     classifiers=[
         "Programming Language :: Python",
