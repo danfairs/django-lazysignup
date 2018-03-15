@@ -2,6 +2,7 @@ import re
 from django.conf import settings
 
 LAZYSIGNUP_USER_MODEL = getattr(settings, 'LAZYSIGNUP_USER_MODEL', settings.AUTH_USER_MODEL)
+LAZYSIGNUP_USER_NAME_FIELD = getattr(settings, 'LAZYSIGNUP_USER_NAME_FIELD', 'username')
 LAZYSIGNUP_CUSTOM_USER_CREATION_FORM = getattr(
     settings,
     'LAZYSIGNUP_CUSTOM_USER_CREATION_FORM',
