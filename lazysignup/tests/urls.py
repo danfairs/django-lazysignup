@@ -19,8 +19,10 @@ admin.autodiscover()
 # URL test patterns for lazysignup. Use this file to ensure a consistent
 # set of URL patterns are used when running unit tests.
 
+from django.contrib import admin
+
 urlpatterns = [
-    url(r'^admin/?', include(admin.site.urls)),
+    url(r'^admin/?', admin.site.urls),
     url(r'^convert/', include('lazysignup.urls')),
     url(r'^custom_convert/', views.convert, {
         'template_name': 'lazysignup/done.html'
