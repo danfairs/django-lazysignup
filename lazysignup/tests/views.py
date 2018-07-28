@@ -4,15 +4,21 @@ from lazysignup.decorators import allow_lazy_user, require_lazy_user, require_no
 
 def view(request):
     r = HttpResponse()
-    if request.user.is_authenticated():
-        r.status_code = 500
+    try:
+        if request.user.is_authenticated():
+            r.status_code = 500
+    except TypeError:
+        if request.user.is_authenticated:
+            r.status_code = 500
+
     return r
 
 
 @allow_lazy_user
 def lazy_view(request):
     r = HttpResponse()
-    if request.user.is_anonymous() or request.user.has_usable_password():
+
+    if request.user.is_anonymous or request.user.has_usable_password():
         r.status_code = 500
     return r
 

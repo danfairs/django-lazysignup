@@ -12,7 +12,7 @@ an unusable password set, so that it can't be used to log in as a regular
 user. The way to tell a regular use from a temporary user is to call
 the ``is_lazy_user()`` function from ``lazysignup.templatetags.lazysignup_tags``.
 If this returns ``True``, then the user is temporary. Note that
-``user.is_anonymous()`` will return ``False``  and ``user.is_authenticated()``
+``user.is_anonymous`` will return ``False``  and ``user.is_authenticated``
 will return ``True``. See below for more information on ``is_lazy_user``.
 
 A view is provided to allow such users to convert their temporary account into

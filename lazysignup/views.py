@@ -33,7 +33,7 @@ def convert(request, form_class=None,
             form_class = UserCreationForm
 
     # If we've got an anonymous user, redirect to login
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
         return HttpResponseRedirect(anonymous_redirect)
 
     if request.method == 'POST':

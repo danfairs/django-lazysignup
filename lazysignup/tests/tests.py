@@ -4,7 +4,8 @@ import hashlib
 from functools import wraps
 
 from django.conf import settings
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.urls import reverse, NoReverseMatch
+
 from django.http import HttpRequest
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY
 from django.contrib.auth import authenticate
@@ -71,7 +72,7 @@ class LazyTestCase(TestCase):
         # We have to save the session to cause a session key to be generated.
         self.request.session.save()
 
-    @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
+    @mock.patch('django.urls.resolve')
     def test_session_already_exists(self, mock_resolve):
         # If the user id is already in the session, this decorator should do
         # nothing.
@@ -84,7 +85,7 @@ class LazyTestCase(TestCase):
         f(self.request)
         self.assertEqual(user, self.request.user)
 
-    @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
+    @mock.patch('django.urls.resolve')
     def test_bad_session_already_exists(self, mock_resolve):
         # If the user id is already in the session, but the user doesn't
         # exist, then a user should be created
@@ -96,7 +97,7 @@ class LazyTestCase(TestCase):
         self.assertFalse(self.request.user.username is None)
         self.assertEqual(False, self.request.user.has_usable_password())
 
-    @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
+    @mock.patch('django.urls.resolve')
     def test_create_lazy_user(self, mock_resolve):
         # If there isn't a setup session, then this middleware should create a
         # user with a random username and an unusable password.
@@ -106,7 +107,7 @@ class LazyTestCase(TestCase):
         self.assertFalse(self.request.user.username is None)
         self.assertEqual(False, self.request.user.has_usable_password())
 
-    @mock.patch('django.core.urlresolvers.RegexURLResolver.resolve')
+    @mock.patch('django.urls.resolve')
     def test_banned_user_agents(self, mock_resolve):
         # If the client's user agent matches a regex in the banned
         # list, then a user shouldn't be created.

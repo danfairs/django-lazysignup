@@ -84,7 +84,13 @@ class LazyUser(models.Model):
 
     @classmethod
     def get_user_class(cls):
-        return cls._meta.get_field('user').rel.to
+        related_user_field = cls._meta.get_field('user')
+        # Django < 1.9 has rel.to
+        if hasattr(related_user_field, 'rel'):
+            rel_to = related_user_field.rel.to if related_user_field.rel else None
+        elif hasattr(related_user_field, 'remote_field'):
+            rel_to = related_user_field.remote_field.model if related_user_field.remote_field else None
+        return rel_to
 
     def __str__(self):
         return '{0}:{1}'.format(self.user, self.created)
