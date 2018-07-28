@@ -1,4 +1,4 @@
-.. image:: https://api.travis-ci.org/danfairs/django-lazysignup.png
+.. image:: https://api.travis-ci.org/LaundroMat/django-lazysignup.png
 
 Introduction
 ============
