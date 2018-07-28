@@ -17,7 +17,7 @@ ALLOW_LAZY_REGISTRY = {}
 def allow_lazy_user(func):
     def wrapped(request, *args, **kwargs):
         assert hasattr(request, 'session'), ("You need to have the session "
-                                             "app intsalled")
+                                             "app installed")
         if getattr(settings, 'LAZYSIGNUP_ENABLE', True):
             # If the user agent is one we ignore, bail early
             ignore = False
