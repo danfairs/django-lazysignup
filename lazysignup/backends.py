@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 
 class LazySignupBackend(ModelBackend):
 
-    def authenticate(self, username=None):
+    def authenticate(self, request=None, username=None):
         user_class = LazyUser.get_user_class()
         try:
             return user_class.objects.get(**{
