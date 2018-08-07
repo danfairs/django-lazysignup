@@ -2,14 +2,15 @@ sudo: false
 language: python
 python:
   - "3.6"
+  - "3.7"
 addons:
   postgresql: "9.4"
 env:
   matrix:
-    - DJANGO_VERSION="=2.0" DB="postgres"
-    - DJANGO_VERSION="=2.0" DB="mysql"
-    - DJANGO_VERSION="=2.1" DB="postgres"
-    - DJANGO_VERSION="=2.1" DB="mysql"
+    - DJANGO_VERSION="==2.0" DB="postgres"
+    - DJANGO_VERSION="==2.0" DB="mysql"
+    - DJANGO_VERSION="==2.1" DB="postgres"
+    - DJANGO_VERSION="==2.1" DB="mysql"
 # command to install dependencies
 install:
   - pip install Django$DJANGO_VERSION flake8 coverage
