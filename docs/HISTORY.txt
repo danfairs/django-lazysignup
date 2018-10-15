@@ -2,6 +2,11 @@
 Changelog
 =========
 
+2.0.0
+-----
+
+* Drop support for Django prior to 2.1.2 (#60 thanks LaundroMat)
+
 1.2.0
 -----
 

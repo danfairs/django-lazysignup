@@ -25,7 +25,7 @@ tests_require = [
 
 install_requires = [
     'setuptools',
-    'Django>=1.10.0',
+    'Django>=2.1.2',
     'six>=1.9'
 ]
 
