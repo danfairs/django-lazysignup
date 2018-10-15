@@ -28,5 +28,5 @@ class BackendTests(TestCase):
 
         self.assertEqual(
             user.email,
-            self.backend.authenticate('admin').email
+            self.backend.authenticate(None, 'admin').email
         )

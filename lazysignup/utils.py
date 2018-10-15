@@ -1,7 +1,8 @@
 def is_lazy_user(user):
     """ Return True if the passed user is a lazy user. """
     # Anonymous users are not lazy.
-    if user.is_anonymous():
+
+    if user.is_anonymous:
         return False
 
     # Check the user backend. If the lazy signup backend

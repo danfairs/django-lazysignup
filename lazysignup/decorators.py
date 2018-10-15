@@ -17,7 +17,7 @@ ALLOW_LAZY_REGISTRY = {}
 def allow_lazy_user(func):
     def wrapped(request, *args, **kwargs):
         assert hasattr(request, 'session'), ("You need to have the session "
-                                             "app intsalled")
+                                             "app installed")
         if getattr(settings, 'LAZYSIGNUP_ENABLE', True):
             # If the user agent is one we ignore, bail early
             ignore = False
@@ -30,7 +30,7 @@ def allow_lazy_user(func):
             # If there's already a key in the session for a valid user, then
             # we don't need to do anything. If the user isn't valid, then
             # get_user will return an anonymous user
-            if get_user(request).is_anonymous() and not ignore:
+            if get_user(request).is_anonymous and not ignore:
                 # If not, then we have to create a user, and log them in.
                 from lazysignup.models import LazyUser
                 user, username = LazyUser.objects.create_lazy_user()

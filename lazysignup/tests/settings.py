@@ -57,13 +57,14 @@ AUTHENTICATION_BACKENDS = (
     "lazysignup.backends.LazySignupBackend",
 )
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.auth.middleware.SessionAuthenticationMiddleware",
+    # "django.contrib.auth.middleware.SessionAuthenticationMiddleware",
 ]
+
 
 TEMPLATES = [
     {

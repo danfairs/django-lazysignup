@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.contenttypes',
+	'django.contrib.admin',
 )
 
 SITE_ID = 1
@@ -57,7 +58,7 @@ AUTHENTICATION_BACKENDS = (
     "lazysignup.backends.LazySignupBackend",
 )
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
