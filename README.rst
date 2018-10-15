@@ -10,7 +10,3 @@ they can convert their temporary user account to a real user account.
 `Read the full documentation`_.
 
 .. _Read the full documentation: http://django-lazysignup.readthedocs.org/
-
-**This fork is only intended to be used with Django 2.0 or higher.** 
-
-The documentation has not been updated for Django 2.0 (yet), but there shouldn't be too many differences.  
