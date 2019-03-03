@@ -2,12 +2,12 @@ import re
 import uuid
 
 from django.conf import settings
-from django.db import models
+from django.db import models, IntegrityError
 from django.utils.timezone import now
 import six
 
 from lazysignup.constants import USER_AGENT_BLACKLIST
-from lazysignup.exceptions import NotLazyError
+from lazysignup.exceptions import NotLazyError, GenerateUsernameError
 from lazysignup.utils import is_lazy_user
 from lazysignup.signals import converted
 from lazysignup import constants
@@ -39,8 +39,22 @@ class LazyUserManager(models.Manager):
         object (which may be of a custom class), and the username.
         """
         user_class = self.model.get_user_class()
-        username = self.generate_username(user_class)
-        user = user_class.objects.create_user(username, '')
+
+        username = None
+        user = None
+        max_attempts = 3
+        for i in range(max_attempts):
+            try:
+                username = self.generate_username(user_class)
+                user = user_class.objects.create_user(username, '')
+                break
+            except IntegrityError:
+                # A user with this username already exists, generate a new username and try again
+                continue
+
+        if user is None:
+            raise GenerateUsernameError('Unexpected exception unable to create lazy_user object')
+
         self.create(user=user)
         return user, username
 
