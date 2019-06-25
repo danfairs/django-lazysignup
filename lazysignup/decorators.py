@@ -35,7 +35,7 @@ def allow_lazy_user(func):
                 from lazysignup.models import LazyUser
                 user, username = LazyUser.objects.create_lazy_user()
                 request.user = None
-                user = authenticate(username=username)
+                user = authenticate(request=request, username=username)
                 assert user, ("Lazy user creation and authentication "
                               "failed. Have you got "
                               "lazysignup.backends.LazySignupBackend in "
