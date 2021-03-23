@@ -12,9 +12,10 @@ LAZYSIGNUP_CUSTOM_USER_CREATION_FORM = getattr(
 DEFAULT_BLACKLIST = (
     'slurp',
     'googlebot',
-    'yandex',
     'msnbot',
     'baiduspider',
+    '(?!yandexsearch$)yandex',
+    'YaDirectFetcher',
 )
 USER_AGENT_BLACKLIST = []
 
