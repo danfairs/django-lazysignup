@@ -17,7 +17,7 @@ Updates
 
 This is a fork from `danfairsdjango-lazysignup <https://github.com/danfairs/django-lazysignup>`_.
 
-* Replace static image at the beginning of the README with an actual current status badge.
+* Replace static image at the beginning in README with an actual current status badge.
 * Update it to be compatible with django 3.1.5. 
 * Fix wrong use of is with == for literal comparison.
 * Fix custom_user_tests to be compatible with django 3.1.5.
