@@ -31,7 +31,7 @@ from lazysignup.models import LazyUser
 from lazysignup.signals import converted
 from lazysignup.utils import is_lazy_user
 
-if settings.AUTH_USER_MODEL is 'auth.User':
+if settings.AUTH_USER_MODEL == 'auth.User':
     from lazysignup.tests.forms import GoodUserCreationForm
 else:
     from custom_user_tests.forms import GoodUserCreationForm
