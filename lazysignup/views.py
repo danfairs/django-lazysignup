@@ -16,15 +16,18 @@ from lazysignup import constants
 
 
 @allow_lazy_user
-def convert(request, form_class=None,
-            redirect_field_name='redirect_to',
-            anonymous_redirect=settings.LOGIN_URL,
-            template_name='lazysignup/convert.html',
-            ajax_template_name='lazysignup/convert_ajax.html'):
-    """ Convert a temporary user to a real one. Reject users who don't
+def convert(
+    request,
+    form_class=None,
+    redirect_field_name="redirect_to",
+    anonymous_redirect=settings.LOGIN_URL,
+    template_name="lazysignup/convert.html",
+    ajax_template_name="lazysignup/convert_ajax.html",
+):
+    """Convert a temporary user to a real one. Reject users who don't
     appear to be temporary users (ie. they have a usable password)
     """
-    redirect_to = 'lazysignup_convert_done'
+    redirect_to = "lazysignup_convert_done"
 
     if form_class is None:
         if constants.LAZYSIGNUP_CUSTOM_USER_CREATION_FORM is not None:
@@ -36,7 +39,7 @@ def convert(request, form_class=None,
     if request.user.is_anonymous:
         return HttpResponseRedirect(anonymous_redirect)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         redirect_to = request.POST.get(redirect_field_name) or redirect_to
         form = form_class(request.POST, instance=request.user)
         if form.is_valid():
@@ -47,8 +50,7 @@ def convert(request, form_class=None,
                 # Request to an Ajax client, or just redirect back for a
                 # regular client.
                 if request.is_ajax():
-                    return HttpResponseBadRequest(
-                        content=_(u"Already converted."))
+                    return HttpResponseBadRequest(content=_(u"Already converted."))
                 else:
                     return redirect(redirect_to)
 
@@ -77,8 +79,5 @@ def convert(request, form_class=None,
     return render(
         request,
         template_name,
-        {
-            'form': form,
-            'redirect_to': redirect_to
-        },
+        {"form": form, "redirect_to": redirect_to},
     )

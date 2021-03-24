@@ -7,50 +7,48 @@ def get_version():
     """
     Extracts the version number from the version.py file.
     """
-    VERSION_FILE = 'lazysignup/version.py'
-    mo = re.search(r'^__version__ = [\'"]([^\'"]*)[\'"]', open(VERSION_FILE, 'rt').read(), re.M)
+    VERSION_FILE = "lazysignup/version.py"
+    mo = re.search(
+        r'^__version__ = [\'"]([^\'"]*)[\'"]', open(VERSION_FILE, "rt").read(), re.M
+    )
     if mo:
         return mo.group(1)
     else:
-        raise RuntimeError('Unable to find version string in {0}.'.format(VERSION_FILE))
+        raise RuntimeError("Unable to find version string in {0}.".format(VERSION_FILE))
 
 
 tests_require = [
-    'coverage>=3.7.1',
-    'flake8>=2.2.0',
-    'mock>=1.0.1',
-    'psycopg2>=2.6',
-    'mysqlclient>=1.3.3',
+    "coverage>=3.7.1",
+    "flake8>=2.2.0",
+    "mock>=1.0.1",
+    "psycopg2>=2.6",
+    "mysqlclient>=1.3.3",
 ]
 
-install_requires = [
-    'setuptools',
-    'Django>=2.1.2',
-    'six>=1.9'
-]
+install_requires = ["setuptools", "Django>=2.1.2", "six>=1.9"]
 
 extras_require = {
-    'test': tests_require,
-    'packaging': ['wheel'],
-    'docs': ['Sphinx>=1.2.2', 'sphinx_rtd_theme'],
+    "test": tests_require,
+    "packaging": ["wheel"],
+    "docs": ["Sphinx>=1.2.2", "sphinx_rtd_theme"],
 }
 
 everything = set()
 for deps in extras_require.values():
     everything.update(deps)
 everything.update(set(install_requires))
-extras_require['all'] = list(everything)
+extras_require["all"] = list(everything)
 
 
 setup(
-    name='django-lazysignup',
+    name="django-lazysignup",
     version=get_version(),
     description="Lazy signup for Django",
     long_description=open("README.rst").read() + "\n" + open(os.path.join("docs", "HISTORY.txt")).read(),
-    url='http://github.com/danfairs/django-lazysignup',
-    author='Dan Fairs',
-    author_email='dan.fairs@gmail.com',
-    keywords='django lazy signup app user',
+    url="http://github.com/danfairs/django-lazysignup",
+    author="Dan Fairs",
+    author_email="dan.fairs@gmail.com",
+    keywords="django lazy signup app user",
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
@@ -59,9 +57,9 @@ setup(
         "Framework :: Django",
         "Framework :: Django :: 1.10",
         "Development Status :: 4 - Beta",
-        "License :: OSI Approved :: BSD License"
+        "License :: OSI Approved :: BSD License",
     ],
-    license='BSD',
+    license="BSD",
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,

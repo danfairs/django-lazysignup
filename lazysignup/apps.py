@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class LazySignupConfig(AppConfig):
-    name = 'lazysignup'
+    name = "lazysignup"
     verbose_name = "Lazy Signup"

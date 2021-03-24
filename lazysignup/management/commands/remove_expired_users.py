@@ -19,7 +19,8 @@ class Command(BaseCommand):
 
     def to_delete(self):
         delete_before = datetime.datetime.now() - datetime.timedelta(
-            seconds=settings.SESSION_COOKIE_AGE)
+            seconds=settings.SESSION_COOKIE_AGE
+        )
         return LazyUser.objects.filter(
             user__last_login__lt=delete_before
-        ).select_related('user')
+        ).select_related("user")

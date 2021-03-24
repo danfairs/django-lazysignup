@@ -7,6 +7,7 @@ class BackendTests(TestCase):
     """
     Tests for LazySignupBackend
     """
+
     def setUp(self):
         self.backend = LazySignupBackend()
 
@@ -14,19 +15,14 @@ class BackendTests(TestCase):
         """
         Test no user exists
         """
-        self.assertIsNone(self.backend.authenticate('nobody'))
+        self.assertIsNone(self.backend.authenticate("nobody"))
 
     def test_authenticate(self):
         """
         :return:
         """
         user = get_user_model().objects.create_user(
-            username='admin',
-            email='admin@example.com',
-            password='password'
+            username="admin", email="admin@example.com", password="password"
         )
 
-        self.assertEqual(
-            user.email,
-            self.backend.authenticate(None, 'admin').email
-        )
+        self.assertEqual(user.email, self.backend.authenticate(None, "admin").email)

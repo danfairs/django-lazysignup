@@ -31,7 +31,7 @@ from lazysignup.models import LazyUser
 from lazysignup.signals import converted
 from lazysignup.utils import is_lazy_user
 
-if settings.AUTH_USER_MODEL == 'auth.User':
+if settings.AUTH_USER_MODEL == "auth.User":
     from lazysignup.tests.forms import GoodUserCreationForm
 else:
     from custom_user_tests.forms import GoodUserCreationForm
@@ -47,7 +47,7 @@ _missing = object()
 
 def no_lazysignup(func):
     def wrapped(*args, **kwargs):
-        if hasattr(settings, 'LAZYSIGNUP_ENABLE'):
+        if hasattr(settings, "LAZYSIGNUP_ENABLE"):
             old = settings.LAZYSIGNUP_ENABLE
         else:
             old = _missing
@@ -56,15 +56,15 @@ def no_lazysignup(func):
             result = func(*args, **kwargs)
         finally:
             if old is _missing:
-                delattr(settings, 'LAZYSIGNUP_ENABLE')
+                delattr(settings, "LAZYSIGNUP_ENABLE")
             else:
                 settings.LAZYSIGNUP_ENABLE = old
         return result
+
     return wraps(func)(wrapped)
 
 
 class LazyTestCase(TestCase):
-
     def setUp(self):
         self.request = HttpRequest()
         SessionMiddleware().process_request(self.request)
@@ -72,20 +72,20 @@ class LazyTestCase(TestCase):
         # We have to save the session to cause a session key to be generated.
         self.request.session.save()
 
-    @mock.patch('django.urls.resolve')
+    @mock.patch("django.urls.resolve")
     def test_session_already_exists(self, mock_resolve):
         # If the user id is already in the session, this decorator should do
         # nothing.
         f = allow_lazy_user(lambda request: 1)
-        user = get_user_model().objects.create_user('test', 'test@test.com', 'test')
+        user = get_user_model().objects.create_user("test", "test@test.com", "test")
         self.request.user = AnonymousUser()
-        login(self.request, authenticate(username='test', password='test'))
+        login(self.request, authenticate(username="test", password="test"))
         mock_resolve.return_value = (f, None, None)
 
         f(self.request)
         self.assertEqual(user, self.request.user)
 
-    @mock.patch('django.urls.resolve')
+    @mock.patch("django.urls.resolve")
     def test_bad_session_already_exists(self, mock_resolve):
         # If the user id is already in the session, but the user doesn't
         # exist, then a user should be created
@@ -97,7 +97,7 @@ class LazyTestCase(TestCase):
         self.assertFalse(self.request.user.username is None)
         self.assertEqual(False, self.request.user.has_usable_password())
 
-    @mock.patch('django.urls.resolve')
+    @mock.patch("django.urls.resolve")
     def test_create_lazy_user(self, mock_resolve):
         # If there isn't a setup session, then this middleware should create a
         # user with a random username and an unusable password.
@@ -107,29 +107,29 @@ class LazyTestCase(TestCase):
         self.assertFalse(self.request.user.username is None)
         self.assertEqual(False, self.request.user.has_usable_password())
 
-    @mock.patch('django.urls.resolve')
+    @mock.patch("django.urls.resolve")
     def test_banned_user_agents(self, mock_resolve):
         # If the client's user agent matches a regex in the banned
         # list, then a user shouldn't be created.
-        self.request.META['HTTP_USER_AGENT'] = 'search engine'
+        self.request.META["HTTP_USER_AGENT"] = "search engine"
         f = allow_lazy_user(lambda request: 1)
         mock_resolve.return_value = (f, None, None)
 
         f(self.request)
-        self.assertFalse(hasattr(self.request, 'user'))
+        self.assertFalse(hasattr(self.request, "user"))
         self.assertEqual(0, len(get_user_model().objects.all()))
 
     def test_normal_view(self):
         # Calling our undecorated view should *not* create a user. If one is
         # created, then the view will set the status code to 500.
-        response = self.client.get('/nolazy/')
+        response = self.client.get("/nolazy/")
         self.assertEqual(200, response.status_code)
 
     def test_decorated_view(self):
         # Calling our undecorated view should create a user. If one is
         # created, then the view will set the status code to 500.
         self.assertEqual(0, len(get_user_model().objects.all()))
-        response = self.client.get('/lazy/')
+        response = self.client.get("/lazy/")
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(get_user_model().objects.all()))
 
@@ -137,7 +137,7 @@ class LazyTestCase(TestCase):
         # remove_expired_users used to be hardcoded to look for an unusable
         # password and the Django user model. Make sure that it actually
         # uses the LazyUser mechanism.
-        get_user_model().objects.create_user('dummy2', '')
+        get_user_model().objects.create_user("dummy2", "")
         user, _ = LazyUser.objects.create_lazy_user()
         user.last_login = datetime.datetime(1972, 1, 1)
         user.save()
@@ -145,7 +145,7 @@ class LazyTestCase(TestCase):
         c.handle()
         users = get_user_model().objects.all()
         self.assertEqual(1, len(users))
-        self.assertEqual('dummy2', users[0].username)
+        self.assertEqual("dummy2", users[0].username)
 
     def test_remove_expired_users_session_cookie_age(self):
         # The remove_expired_users should look at SESSION_COOKIE_AGE to figure
@@ -163,174 +163,202 @@ class LazyTestCase(TestCase):
 
     def test_convert_ajax(self):
         # Calling convert with an AJAX request should result in a 200
-        self.client.get('/lazy/')
-        response = self.client.post('/convert/', {
-            'username': 'demo',
-            'password1': 'password',
-            'password2': 'password',
-        }, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.client.get("/lazy/")
+        response = self.client.post(
+            "/convert/",
+            {
+                "username": "demo",
+                "password1": "password",
+                "password2": "password",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
         self.assertEqual(200, response.status_code)
 
         users = get_user_model().objects.all()
         self.assertEqual(1, len(users))
-        self.assertEqual('demo', users[0].username)
+        self.assertEqual("demo", users[0].username)
 
         # We should find that the auth backend used is no longer the
         # Lazy backend, as the conversion should have logged the new
         # user in.
         self.assertNotEqual(
-            'lazysignup.backends.LazySignupBackend',
-            self.client.session[BACKEND_SESSION_KEY])
+            "lazysignup.backends.LazySignupBackend",
+            self.client.session[BACKEND_SESSION_KEY],
+        )
 
     def test_convert_custom_template(self):
         # Check a custom template is used, if specified.
-        response = self.client.get('/custom_convert/')
-        self.assertEqual(
-            ['lazysignup/done.html'],
-            [t.name for t in response.templates])
+        response = self.client.get("/custom_convert/")
+        self.assertEqual(["lazysignup/done.html"], [t.name for t in response.templates])
 
     def test_convert_ajax_custom_template(self):
         # If a custom ajax template is provided, then it should be used when
         # rendering an ajax GET of the convert view. (Usually, this would be
         # a 'chromeless' version of the regular template)
         response = self.client.get(
-            '/custom_convert_ajax/',
-            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(
-            ['lazysignup/done.html'],
-            [t.name for t in response.templates])
+            "/custom_convert_ajax/", HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(["lazysignup/done.html"], [t.name for t in response.templates])
 
     def test_convert_non_ajax(self):
         # If it's a regular web browser, we should get a 301.
-        self.client.get('/lazy/')
-        response = self.client.post('/convert/', {
-            'username': 'demo',
-            'password1': 'password',
-            'password2': 'password',
-        })
+        self.client.get("/lazy/")
+        response = self.client.post(
+            "/convert/",
+            {
+                "username": "demo",
+                "password1": "password",
+                "password2": "password",
+            },
+        )
         self.assertEqual(302, response.status_code)
 
         users = get_user_model().objects.all()
         self.assertEqual(1, len(users))
-        self.assertEqual('demo', users[0].username)
+        self.assertEqual("demo", users[0].username)
 
     def test_convert_mismatched_passwords_ajax(self):
-        self.client.get('/lazy/')
-        response = self.client.post('/convert/', {
-            'username': 'demo',
-            'password1': 'password',
-            'password2': 'passwordx',
-        }, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.client.get("/lazy/")
+        response = self.client.post(
+            "/convert/",
+            {
+                "username": "demo",
+                "password1": "password",
+                "password2": "passwordx",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
         self.assertEqual(400, response.status_code)
-        self.assertFalse(response.content.find(b'password') == -1)
+        self.assertFalse(response.content.find(b"password") == -1)
         users = get_user_model().objects.all()
         self.assertEqual(1, len(users))
-        self.assertNotEqual('demo', users[0].username)
+        self.assertNotEqual("demo", users[0].username)
 
     def test_user_exists_ajax(self):
-        get_user_model().objects.create_user('demo', '', 'foo')
-        self.client.get('/lazy/')
-        response = self.client.post('/convert/', {
-            'username': 'demo',
-            'password1': 'password',
-            'password2': 'password',
-        }, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        get_user_model().objects.create_user("demo", "", "foo")
+        self.client.get("/lazy/")
+        response = self.client.post(
+            "/convert/",
+            {
+                "username": "demo",
+                "password1": "password",
+                "password2": "password",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
         self.assertEqual(400, response.status_code)
-        self.assertFalse(response.content.find(b'username') == -1)
+        self.assertFalse(response.content.find(b"username") == -1)
 
     def test_convert_mismatched_no_ajax(self):
-        self.client.get('/lazy/')
-        response = self.client.post('/convert/', {
-            'username': 'demo',
-            'password1': 'password',
-            'password2': 'passwordx',
-        })
+        self.client.get("/lazy/")
+        response = self.client.post(
+            "/convert/",
+            {
+                "username": "demo",
+                "password1": "password",
+                "password2": "passwordx",
+            },
+        )
         self.assertEqual(200, response.status_code)
-        self.assertFalse(response.content.find(b'password') == -1)
+        self.assertFalse(response.content.find(b"password") == -1)
         users = get_user_model().objects.all()
         self.assertEqual(1, len(users))
-        self.assertNotEqual('demo', users[0].username)
+        self.assertNotEqual("demo", users[0].username)
 
     def test_user_exists_no_ajax(self):
-        get_user_model().objects.create_user('demo', '', 'foo')
-        self.client.get('/lazy/')
-        response = self.client.post('/convert/', {
-            'username': 'demo',
-            'password1': 'password',
-            'password2': 'password',
-        })
+        get_user_model().objects.create_user("demo", "", "foo")
+        self.client.get("/lazy/")
+        response = self.client.post(
+            "/convert/",
+            {
+                "username": "demo",
+                "password1": "password",
+                "password2": "password",
+            },
+        )
         self.assertEqual(200, response.status_code)
-        self.assertFalse(response.content.find(b'username') == -1)
+        self.assertFalse(response.content.find(b"username") == -1)
 
     def test_convert_existing_user_ajax(self):
-        get_user_model().objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
-        self.client.login(username='dummy', password='dummy')
-        response = self.client.post('/convert/', {
-            'username': 'demo',
-            'password1': 'password',
-            'password2': 'password',
-        }, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        get_user_model().objects.create_user("dummy", "dummy@dummy.com", "dummy")
+        self.client.login(username="dummy", password="dummy")
+        response = self.client.post(
+            "/convert/",
+            {
+                "username": "demo",
+                "password1": "password",
+                "password2": "password",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
         self.assertEqual(400, response.status_code)
 
     def test_convert_existing_user_no_ajax(self):
-        get_user_model().objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
-        self.client.login(username='dummy', password='dummy')
-        response = self.client.post('/convert/', {
-            'username': 'demo',
-            'password1': 'password',
-            'password2': 'password',
-        })
+        get_user_model().objects.create_user("dummy", "dummy@dummy.com", "dummy")
+        self.client.login(username="dummy", password="dummy")
+        response = self.client.post(
+            "/convert/",
+            {
+                "username": "demo",
+                "password1": "password",
+                "password2": "password",
+            },
+        )
         self.assertEqual(302, response.status_code)
 
     def test_get_convert(self):
-        self.client.get('/lazy/')
-        response = self.client.get('/convert/')
+        self.client.get("/lazy/")
+        response = self.client.get("/convert/")
         self.assertEqual(200, response.status_code)
 
     def test_get_convert_via_ajax(self):
         # Load convert.html via AJAX
-        self.client.get('/lazy/')
-        response = self.client.get(reverse('lazysignup_convert'),
-                                   HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.client.get("/lazy/")
+        response = self.client.get(
+            reverse("lazysignup_convert"), HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
         self.assertEqual(200, response.status_code)
 
     @no_lazysignup
     def test_convert_anon(self):
         # If the Convert view gets an anonymous user, it should redirect
         # to the login page. Not much else it can do!
-        response = self.client.get('/convert/')
+        response = self.client.get("/convert/")
         self.assertEqual(302, response.status_code)
-        self.assertEqual(
-            settings.LOGIN_URL,
-            response['location']
-        )
+        self.assertEqual(settings.LOGIN_URL, response["location"])
 
     def test_conversion_keeps_same_user(self):
-        self.client.get('/lazy/')
-        self.client.post('/convert/', {
-            'username': 'demo',
-            'password1': 'password',
-            'password2': 'password',
-        })
+        self.client.get("/lazy/")
+        self.client.post(
+            "/convert/",
+            {
+                "username": "demo",
+                "password1": "password",
+                "password2": "password",
+            },
+        )
         self.assertEqual(1, len(get_user_model().objects.all()))
 
     @no_lazysignup
     def test_no_lazysignup_decorator(self):
-        response = self.client.get('/lazy/')
+        response = self.client.get("/lazy/")
         self.assertEqual(500, response.status_code)
 
-    @skipIf(settings.AUTH_USER_MODEL != 'auth.User', 'Only run with standard user model')
+    @skipIf(
+        settings.AUTH_USER_MODEL != "auth.User", "Only run with standard user model"
+    )
     def test_bad_custom_convert_form(self):
         # Passing a form class to the conversion view that doesn't have
         # a get_credentials method should raise an AttributeError
         with self.assertRaises(AttributeError):
             self.client.post(
-                reverse('test_bad_convert'),
+                reverse("test_bad_convert"),
                 {
-                    'username': 'demo',
-                    'password1': 'password',
-                    'password2': 'password',
-                }
+                    "username": "demo",
+                    "password1": "password",
+                    "password2": "password",
+                },
             )
 
     def test_username_not_based_on_session_key(self):
@@ -353,7 +381,7 @@ class LazyTestCase(TestCase):
         # It used to be the case that allow_lazy_user had to be first in the
         # decorator list. This is no longer the case.
         self.request.user = AnonymousUser()
-        self.request.method = 'POST'
+        self.request.method = "POST"
         v = require_POST(lazy_view)
 
         response = v(self.request)
@@ -364,11 +392,11 @@ class LazyTestCase(TestCase):
         self.assertEqual(False, is_lazy_user(user))
 
     def test_is_lazy_user_model_backend(self):
-        user = get_user_model().objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
+        user = get_user_model().objects.create_user("dummy", "dummy@dummy.com", "dummy")
         self.assertEqual(False, is_lazy_user(user))
 
     def test_is_lazy_user_unusable_password(self):
-        user = get_user_model().objects.create_user('dummy', 'dummy@dummy.com')
+        user = get_user_model().objects.create_user("dummy", "dummy@dummy.com")
         self.assertEqual(False, is_lazy_user(user))
 
     def test_is_lazy_user_lazy(self):
@@ -393,14 +421,14 @@ class LazyTestCase(TestCase):
         backend = LazySignupBackend()
         pk = get_user_model().objects.all()[0].pk
         self.assertEqual(
-            'lazysignup.backends.LazySignupBackend',
-            backend.get_user(pk).backend
+            "lazysignup.backends.LazySignupBackend", backend.get_user(pk).backend
         )
 
     def test_bad_session_user_id(self):
         self.request.session[SESSION_KEY] = 1000
-        self.request.session[BACKEND_SESSION_KEY] = \
-            'lazysignup.backends.LazySignupBackend'
+        self.request.session[
+            BACKEND_SESSION_KEY
+        ] = "lazysignup.backends.LazySignupBackend"
         lazy_view(self.request)
 
     def test_convert_good(self):
@@ -408,9 +436,9 @@ class LazyTestCase(TestCase):
         # correctly converts the lazy user
         user, username = LazyUser.objects.create_lazy_user()
         d = {
-            'username': 'test',
-            'password1': 'password',
-            'password2': 'password',
+            "username": "test",
+            "password1": "password",
+            "password2": "password",
         }
         form = GoodUserCreationForm(d, instance=user)
         self.assertTrue(form.is_valid())
@@ -420,7 +448,7 @@ class LazyTestCase(TestCase):
 
     def test_convert_non_lazy(self):
         # Attempting to convert a non-lazy user should raise a TypeError
-        user = get_user_model().objects.create_user('dummy', 'dummy@dummy.com', 'dummy')
+        user = get_user_model().objects.create_user("dummy", "dummy@dummy.com", "dummy")
         form = GoodUserCreationForm(instance=user)
         self.assertRaises(NotLazyError, LazyUser.objects.convert, form)
 
@@ -458,8 +486,8 @@ class LazyTestCase(TestCase):
         # now, so we can grab the final session key.
         get_user(self.request)
         key = self.request.session.session_key
-        username = hashlib.sha1(key.encode('ascii')).hexdigest()[:30]
-        get_user_model().objects.create_user(username, '')
+        username = hashlib.sha1(key.encode("ascii")).hexdigest()[:30]
+        get_user_model().objects.create_user(username, "")
         r = lazy_view(self.request)
         self.assertEqual(200, r.status_code)
 
@@ -470,17 +498,18 @@ class LazyTestCase(TestCase):
         """
         user, username = LazyUser.objects.create_lazy_user()
         d = {
-            'username': 'test',
-            'password1': 'password',
-            'password2': 'password',
+            "username": "test",
+            "password1": "password",
+            "password2": "password",
         }
         form = GoodUserCreationForm(d, instance=user)
         # setup signal
         self.handled = False
 
         def handler(sender, **kwargs):
-            self.assertEqual(kwargs['user'], user)
+            self.assertEqual(kwargs["user"], user)
             self.handled = True
+
         converted.connect(handler)
         # convert user
         user = LazyUser.objects.convert(form)

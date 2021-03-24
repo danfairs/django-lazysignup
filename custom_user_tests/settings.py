@@ -1,55 +1,53 @@
 import os
 
-test_db = os.environ.get('DB', None)
+test_db = os.environ.get("DB", None)
 
-if test_db == 'sqlite' or test_db is None:
+if test_db == "sqlite" or test_db is None:
     # Default is SQLite
     db_config = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'lazysignup',
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "lazysignup",
     }
-elif test_db == 'postgres':
+elif test_db == "postgres":
     db_config = {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'USER': 'postgres',
-        'NAME': 'lazysignup',
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "USER": "postgres",
+        "NAME": "lazysignup",
     }
-elif test_db == 'local-postgres':
+elif test_db == "local-postgres":
     db_config = {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'lazysignup',
-        'USER': 'lazysignup',
-        'PASSWORD': 'lazysignup',
-        'HOST': 'localhost'
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "lazysignup",
+        "USER": "lazysignup",
+        "PASSWORD": "lazysignup",
+        "HOST": "localhost",
     }
-elif test_db == 'mysql':
+elif test_db == "mysql":
     db_config = {
-        'ENGINE': 'django.db.backends.mysql',
-        'USER': 'travis',
-        'NAME': 'lazysignup',
+        "ENGINE": "django.db.backends.mysql",
+        "USER": "travis",
+        "NAME": "lazysignup",
     }
-elif test_db == 'local-mysql':
+elif test_db == "local-mysql":
     db_config = {
-        'ENGINE': 'django.db.backends.mysql',
-        'USER': 'lazysignup',
-        'NAME': 'lazysignup',
-        'PASSWORD': 'lazysignup',
+        "ENGINE": "django.db.backends.mysql",
+        "USER": "lazysignup",
+        "NAME": "lazysignup",
+        "PASSWORD": "lazysignup",
     }
 else:
-    raise RuntimeError('Unsupported test DB {0}'.format(test_db))
+    raise RuntimeError("Unsupported test DB {0}".format(test_db))
 
-DATABASES = {
-    'default': db_config
-}
+DATABASES = {"default": db_config}
 
 INSTALLED_APPS = (
-    'custom_user_tests',
-    'lazysignup',
-    'django.contrib.auth',
-    'django.contrib.sessions',
-    'django.contrib.contenttypes',
-	'django.contrib.admin',
-	'django.contrib.messages',
+    "custom_user_tests",
+    "lazysignup",
+    "django.contrib.auth",
+    "django.contrib.sessions",
+    "django.contrib.contenttypes",
+    "django.contrib.admin",
+    "django.contrib.messages",
 )
 
 SITE_ID = 1
@@ -69,26 +67,26 @@ MIDDLEWARE = [
 LAZYSIGNUP_USER_AGENT_BLACKLIST = [
     "^search",
 ]
-LAZYSIGNUP_CUSTOM_USER_CREATION_FORM = 'custom_user_tests.forms.GoodUserCreationForm'
-AUTH_USER_MODEL = 'custom_user_tests.CustomUser'
+LAZYSIGNUP_CUSTOM_USER_CREATION_FORM = "custom_user_tests.forms.GoodUserCreationForm"
+AUTH_USER_MODEL = "custom_user_tests.CustomUser"
 
-ROOT_URLCONF = 'lazysignup.tests.urls'
-SECRET_KEY = 'non-empty-key'
+ROOT_URLCONF = "lazysignup.tests.urls"
+SECRET_KEY = "non-empty-key"
 DEBUG = False
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
                 "django.template.context_processors.i18n",
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
                 "django.template.context_processors.tz",
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },

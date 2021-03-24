@@ -7,6 +7,7 @@ class LazyUserModelTests(TestCase):
     """
     Tests for LazyUser Model
     """
+
     def setUp(self):
         super(LazyUserModelTests, self).setUp()
 
@@ -18,6 +19,5 @@ class LazyUserModelTests(TestCase):
         lazyuser = user.lazyuser
 
         self.assertEqual(
-            str(username) + ':' + str(lazyuser.created),
-            str(user.lazyuser)
+            str(username) + ":" + str(lazyuser.created), str(user.lazyuser)
         )

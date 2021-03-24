@@ -1,5 +1,9 @@
 from django.http import HttpResponse
-from lazysignup.decorators import allow_lazy_user, require_lazy_user, require_nonlazy_user
+from lazysignup.decorators import (
+    allow_lazy_user,
+    require_lazy_user,
+    require_nonlazy_user,
+)
 
 
 def view(request):

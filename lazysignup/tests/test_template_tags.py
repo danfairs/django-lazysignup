@@ -9,11 +9,10 @@ class TemplateTagTests(TestCase):
     """
     Tests the template tags
     """
+
     def setUp(self):
         self.user = get_user_model().objects.create_user(
-            username='user1',
-            email='user1@example.com',
-            password='password'
+            username="user1", email="user1@example.com", password="password"
         )
         self.lazy_user, self.lazy_username = LazyUser.objects.create_lazy_user()
 

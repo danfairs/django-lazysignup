@@ -8,6 +8,7 @@ class LazyUserManagerTests(TestCase):
     """
     Tests for LazyUserManager
     """
+
     def test_generate_username_no_method(self):
         """
         Tests auto generated UUID username
@@ -26,9 +27,9 @@ class LazyUserManagerTests(TestCase):
         Tests auto generated UUID username
         """
         mock_user_class = Mock()
-        mock_user_class.generate_username.return_value = 'testusername'
+        mock_user_class.generate_username.return_value = "testusername"
 
         username = LazyUser.objects.generate_username(mock_user_class)
 
         mock_user_class.generate_username.assert_called_once_with()
-        self.assertEqual(username, 'testusername')
+        self.assertEqual(username, "testusername")

@@ -4,13 +4,10 @@ from django.contrib.auth import get_user_model
 
 
 class LazySignupBackend(ModelBackend):
-
     def authenticate(self, request=None, username=None):
         user_class = LazyUser.get_user_class()
         try:
-            return user_class.objects.get(**{
-                get_user_model().USERNAME_FIELD: username
-            })
+            return user_class.objects.get(**{get_user_model().USERNAME_FIELD: username})
         except user_class.DoesNotExist:
             return None
 
@@ -24,5 +21,5 @@ class LazySignupBackend(ModelBackend):
         except user_class.DoesNotExist:
             user = None
         else:
-            user.backend = 'lazysignup.backends.LazySignupBackend'
+            user.backend = "lazysignup.backends.LazySignupBackend"
         return user

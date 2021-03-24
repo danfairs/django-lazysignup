@@ -14,14 +14,33 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='LazyUser',
+            name="LazyUser",
             fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, db_index=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, unique=True, on_delete=models.CASCADE)),
+                (
+                    "id",
+                    models.AutoField(
+                        serialize=False,
+                        primary_key=True,
+                        verbose_name="ID",
+                        auto_created=True,
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, db_index=True
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        to=settings.AUTH_USER_MODEL,
+                        unique=True,
+                        on_delete=models.CASCADE,
+                    ),
+                ),
             ],
-            options={
-            },
+            options={},
             bases=(models.Model,),
         ),
     ]
