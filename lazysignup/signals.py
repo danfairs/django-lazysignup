@@ -1,3 +1,3 @@
 import django.dispatch
 
-converted = django.dispatch.Signal(providing_args=['user'])
+converted = django.dispatch.Signal()
