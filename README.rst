@@ -23,3 +23,4 @@ This is a fork from `danfairsdjango-lazysignup <https://github.com/danfairs/djan
 * Fix custom_user_tests to be compatible with django 3.1.5.
 * Fix travis tests. Update python and django versions with 3.8-3.9 and 3.1.5.
 * Fix the problem where yandex browser users treated as search engine bots.
+* Fix deprecated urls and signal uses.
