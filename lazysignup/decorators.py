@@ -1,4 +1,4 @@
-from functools import wraps
+from functools import WRAPPER_ASSIGNMENTS, wraps
 
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
@@ -6,7 +6,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import get_user
 from django.contrib.auth import login
 from django.shortcuts import redirect
-from django.utils.decorators import available_attrs
 
 from lazysignup.constants import USER_AGENT_BLACKLIST
 from lazysignup.utils import is_lazy_user
@@ -51,7 +50,7 @@ def allow_lazy_user(func):
 
 def require_lazy_user(*redirect_args, **redirect_kwargs):
     def decorator(func):
-        @wraps(func, assigned=available_attrs(func))
+        @wraps(func, assigned=WRAPPER_ASSIGNMENTS)
         def inner(request, *args, **kwargs):
             if is_lazy_user(request.user):
                 return func(request, *args, **kwargs)
@@ -63,7 +62,7 @@ def require_lazy_user(*redirect_args, **redirect_kwargs):
 
 def require_nonlazy_user(*redirect_args, **redirect_kwargs):
     def decorator(func):
-        @wraps(func, assigned=available_attrs(func))
+        @wraps(func, assigned=WRAPPER_ASSIGNMENTS)
         def inner(request, *args, **kwargs):
             if not is_lazy_user(request.user):
                 return func(request, *args, **kwargs)
