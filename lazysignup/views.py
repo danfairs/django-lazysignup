@@ -54,7 +54,7 @@ def convert(request, form_class=None,
 
             # Re-log the user in, as they'll now not be authenticatable with
             # the Lazy backend
-            login(request, authenticate(**form.get_credentials()))
+            login(request, authenticate(request=request, **form.get_credentials()))
 
             # If we're being called via AJAX, then we just return a 200
             # directly to the client. If not, then we redirect to a
