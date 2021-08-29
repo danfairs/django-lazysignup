@@ -27,6 +27,13 @@ def allow_lazy_user(func):
                     ignore = True
                     break
 
+            # If the user agent does not allow cookies don't create a user 
+            # otherwise every request will create an additional user.
+            # Simply check if the session id is in the cookie of this request..
+            # (This will effectivly ignore 95% of search engine bots)
+            if not request.COOKIES.has_key('sessionid'):
+                ignore = True
+
             # If there's already a key in the session for a valid user, then
             # we don't need to do anything. If the user isn't valid, then
             # get_user will return an anonymous user
