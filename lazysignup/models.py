@@ -32,7 +32,7 @@ class LazyUserManager(models.Manager):
         """
         return hash(str(self))
 
-    username_field = get_user_model().USERNAME_FIELD
+    username_field = constants.LAZYSIGNUP_USER_NAME_FIELD
 
     def create_lazy_user(self):
         """ Create a lazy user. Returns a 2-tuple of the underlying User
