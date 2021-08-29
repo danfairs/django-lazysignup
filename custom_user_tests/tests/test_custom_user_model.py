@@ -3,8 +3,10 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.urls import reverse
 
 from django.http import HttpRequest
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 
+from lazysignup.exceptions import GenerateUsernameError
+from lazysignup.models import LazyUser
 from lazysignup.utils import is_lazy_user
 
 
@@ -37,3 +39,24 @@ class CustomUserModelTests(TestCase):
 
         # The user should no longer be lazy
         self.assertFalse(is_lazy_user(user))
+
+
+class UsernameCollisionModelTests(TransactionTestCase):
+
+    def setUp(self):
+        super(UsernameCollisionModelTests, self).setUp()
+
+        def generate_username():
+            return 'test_collision'
+
+        setattr(get_user_model(), 'generate_username', generate_username)
+
+    def test_username_collision(self):
+
+        user, username = LazyUser.objects.create_lazy_user()
+        try:
+            user, username = LazyUser.objects.create_lazy_user()
+            self.fail('Created a not unique username')
+        except GenerateUsernameError:
+            pass
+
