@@ -1,0 +1,117 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  "Linting":
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.9.x"
+    - name: Install Dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install flake8 coverage
+    - name: Run flake8
+      run: flake8 .
+
+  "Build-and-Test":
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: lazysignup
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres_password
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mariadb:
+        image: mariadb:latest
+        env:
+          MYSQL_USER: travis
+          MYSQL_PASSWORD: mypassword
+          MYSQL_DATABASE: lazysignup
+          MYSQL_ROOT_PASSWORD: myrootpassword
+        ports:
+          - 3306:3306
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd mysqladmin ping
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version:
+          # - "3.6.x"
+          # - "3.7.x"
+          # - "3.8.x"
+          # - "3.9.x"
+          - "3.10.x"
+        django-version:
+          # - "2.2"
+          # - "3.2"
+          - "4.0"
+        db:
+          - "postgres"
+          # - "mysql"
+        settings:
+          - "lazysignup.tests.settings"
+          - "custom_user_tests.settings"
+        exclude:
+          - django-version: "2.2"
+            python-version: "3.10.x"
+
+          - django-version: "4.0"
+            python-version: "3.6.x"
+          - django-version: "4.0"
+            python-version: "3.7.x"
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install database clients
+      run: |
+        apt update
+        apt install --yes mariadb-server postgresql-client
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install django==${{ matrix.django-version }}
+        pip install -e .[all]
+    - name: Initialize database
+      env:
+        DB: ${{ matrix.db }}
+        PGUSER: postgres
+        PGPASSWORD: postgres_password
+        PGDATABASE: lazysignup
+        PGPORT: 5432
+        MYSQL_PORT: 3306
+      run: |
+        [ "$DB" == 'postgres' ] && psql -U postgres -c 'CREATE DATABASE lazysignup;'
+        [ "$DB" == 'mysql' ] && mysql -e 'CREATE DATABASE lazysignup;'
+    - name: Run Tests
+      env:
+        DB: ${{ matrix.db }}
+        SETTINGS: ${{ matrix.settings }}
+      run: |
+        coverage run manage.py test --settings=$SETTINGS
+        coverage report --fail-under=98
