@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 from django.conf import settings
 
-if settings.AUTH_USER_MODEL is 'auth.User':  # pragma: no cover
+if settings.AUTH_USER_MODEL == 'auth.User':  # pragma: no cover
     from lazysignup.tests.forms import GoodUserCreationForm
 else:  # pragma: no cover
     from custom_user_tests.forms import GoodUserCreationForm

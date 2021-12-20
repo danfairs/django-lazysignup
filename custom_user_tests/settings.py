@@ -36,7 +36,7 @@ elif test_db == 'local-mysql':
         'PASSWORD': 'lazysignup',
     }
 else:
-    raise RuntimeError('Unsupported test DB {0}'.format(test_db))
+    raise RuntimeError(f'Unsupported test DB {test_db}')
 
 DATABASES = {
     'default': db_config

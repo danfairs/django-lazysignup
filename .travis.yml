@@ -1,30 +1,49 @@
 sudo: false
+addons:
+  postgresql: "13"
 language: python
 python:
-  - "3.5"
   - "3.6"
-addons:
-  postgresql: "9.4"
+  - "3.7"
+  - "3.8"
+  - "3.9"
+  - "3.10"
 env:
-  matrix:
-    - DJANGO_VERSION="==2.0" DB="postgres"
-    - DJANGO_VERSION="==2.0" DB="mysql"
-    - DJANGO_VERSION="==2.1" DB="postgres"
-    - DJANGO_VERSION="==2.1" DB="mysql"
+  - DJANGO_VERSION="2.2" DB="postgres"
+  - DJANGO_VERSION="2.2" DB="mysql"
+  - DJANGO_VERSION="3.2" DB="postgres"
+  - DJANGO_VERSION="3.2" DB="mysql"
+  - DJANGO_VERSION="4.0" DB="postgres"
+  - DJANGO_VERSION="4.0" DB="mysql"
+jobs:
+  exclude:
+    - python: "3.10"
+      env: DJANGO_VERSION="2.2" DB="postgres"
+    - python: "3.10"
+      env: DJANGO_VERSION="2.2" DB="mysql"
+    - python: "3.6"
+      env: DJANGO_VERSION="4.0" DB="postgres"
+    - python: "3.6"
+      env: DJANGO_VERSION="4.0" DB="mysql"
+    - python: "3.7"
+      env: DJANGO_VERSION="4.0" DB="postgres"
+    - python: "3.7"
+      env: DJANGO_VERSION="4.0" DB="mysql"
+
 # command to install dependencies
 install:
-  - pip install Django$DJANGO_VERSION flake8 coverage
+  - pip install Django==$DJANGO_VERSION flake8 coverage
   - pip install -e .[all]
 # command to run tests
 before_script:
-  - psql -c 'CREATE DATABASE lazysignup;' -U postgres
-  - mysql -e 'CREATE DATABASE lazysignup;'
+  - "[ \"$DB\" == 'postgres' ] && psql -c 'CREATE DATABASE lazysignup;' -U postgres"
+  - "[ \"$DB\" == 'mysql' ] && mysql -e 'CREATE DATABASE lazysignup;'"
 script:
   - flake8 .
   - coverage run manage.py test --settings=lazysignup.tests.settings
   - coverage report --fail-under=98
-  - psql -c 'DROP DATABASE IF EXISTS test_lazysignup;' -U postgres
-  - mysql -e 'DROP DATABASE IF EXISTS test_lazysignup;'
+  - "[ \"$DB\" == 'postgres' ] && psql -c 'DROP DATABASE IF EXISTS test_lazysignup;' -U postgres"
+  - "[ \"$DB\" == 'mysql' ] && mysql -e 'DROP DATABASE IF EXISTS test_lazysignup;'"
   - coverage erase
   - coverage run manage.py test --settings=custom_user_tests.settings
   - coverage report --fail-under=98
