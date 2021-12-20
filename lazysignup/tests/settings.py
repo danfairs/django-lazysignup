@@ -34,7 +34,7 @@ test_db = os.environ.get('DB', 'sqlite')
 try:
     db_config = DB_CONFIGS[test_db]
 except KeyError:
-    raise RuntimeError('Unsupported test DB {0}'.format(test_db))
+    raise RuntimeError(f'Unsupported test DB {test_db}')
 
 DATABASES = {
     'default': db_config
