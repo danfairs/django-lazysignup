@@ -5,8 +5,11 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
-from django.utils.translation import ugettext_lazy as _
 from django.utils.module_loading import import_string
+try:  # removed in Django 4.0, deprecated since 3.0
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _
 
 from lazysignup.decorators import allow_lazy_user
 from lazysignup.exceptions import NotLazyError
@@ -46,7 +49,7 @@ def convert(request, form_class=None,
                 # If the user already has a usable password, return a Bad
                 # Request to an Ajax client, or just redirect back for a
                 # regular client.
-                if request.is_ajax():
+                if is_ajax(request):
                     return HttpResponseBadRequest(
                         content=_(u"Already converted."))
                 else:
@@ -59,20 +62,20 @@ def convert(request, form_class=None,
             # If we're being called via AJAX, then we just return a 200
             # directly to the client. If not, then we redirect to a
             # confirmation page or to redirect_to, if it's set.
-            if request.is_ajax():
+            if is_ajax(request):
                 return HttpResponse()
             else:
                 return redirect(redirect_to)
 
         # Invalid form, now check to see if is an ajax call
-        if request.is_ajax():
+        if is_ajax(request):
             return HttpResponseBadRequest(content=str(form.errors))
     else:
         form = form_class()
 
     # If this is an ajax request, prepend the ajax template to the list of
     # templates to be searched.
-    if request.is_ajax():
+    if is_ajax(request):
         template_name = [ajax_template_name, template_name]
     return render(
         request,
@@ -82,3 +85,12 @@ def convert(request, form_class=None,
             'redirect_to': redirect_to
         },
     )
+
+
+def is_ajax(request):
+    """
+    ``request.is_ajax()`` was removed in Django 4.0, deprecated since 3.1
+
+    Solution taken from: https://docs.djangoproject.com/en/3.1/releases/3.1/
+    """
+    return request.headers.get('x-requested-with') == 'XMLHttpRequest'

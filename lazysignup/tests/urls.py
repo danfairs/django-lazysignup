@@ -1,9 +1,12 @@
-from django.conf.urls import url, include
+try:  # removed in Django 4.0, deprecated since 3.1
+    from django.conf.urls import url, include
+except ImportError:
+    from django.urls import include, re_path as url
 from django.contrib.auth.forms import UserCreationForm
 
 from django.conf import settings
 
-if settings.AUTH_USER_MODEL is 'auth.User':  # pragma: no cover
+if settings.AUTH_USER_MODEL == 'auth.User':  # pragma: no cover
     from lazysignup.tests.forms import GoodUserCreationForm
 else:  # pragma: no cover
     from custom_user_tests.forms import GoodUserCreationForm
