@@ -1,4 +1,8 @@
-from django.conf.urls import url
+try:  # removed in Django 4.0, deprecated since 3.1
+    from django.conf.urls import url
+except ImportError:
+    from django.urls import re_path as url
+
 from django.views.generic import TemplateView
 
 from .views import convert
