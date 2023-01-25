@@ -7,8 +7,11 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.models import UserManager
 from django.core import validators
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+try:  # removed in Django 4.0, deprecated since 3.0
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):

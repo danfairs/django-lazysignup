@@ -42,26 +42,28 @@ DATABASES = {
     'default': db_config
 }
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'custom_user_tests',
     'lazysignup',
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.contenttypes',
+    'django.contrib.messages',
 	'django.contrib.admin',
-)
+]
 
 SITE_ID = 1
 
-AUTHENTICATION_BACKENDS = (
+AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "lazysignup.backends.LazySignupBackend",
-)
+]
 
 MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
 LAZYSIGNUP_USER_AGENT_BLACKLIST = [
